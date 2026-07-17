@@ -1,0 +1,17 @@
+# --- Competition data (do NOT track or redistribute; see Rules §4 Data Security) ---
+# The SDK under data/ is unpacked from the competition archive and is Competition Data.
+data/
+*.zip
+
+# --- Transient / generated ---
+__pycache__/
+*.pyc
+*.pyo
+scratchpad/
+.venv/
+*.egg-info/
+
+# --- Local secrets / credentials (belt-and-suspenders; creds live in ~/.kaggle) ---
+kaggle.json
+*.key
+.env
