@@ -248,7 +248,8 @@ firing wording per model, and fill the 9000 s replay budget with it.
 | v17 | single-post Live-Fill (gen cap 8500) | 61.965 |
 | v19 | single-post Live-Fill (no gen cap) | 64.44 |
 | v21 (M=5,10) | multi-message chain | voided (replay overrun; see below) |
-| **v22** | **single-post + reasoning-collapse injection** | **86.40** |
+| **v22** | **single-post + reasoning-collapse injection (`inj_close`)** | **86.40 (best)** |
+| v23 | added offline-fastest `inj_empty` to the portfolio | 77.58 (**regression**, see §4.6) |
 
 Two decisive corrections took us off the 64.44 plateau. First, the replay budget is **9000 s
 per guardrail** (a per-model budget of 18000 s = 9000 public-replay + 9000 private-replay); our
@@ -284,9 +285,12 @@ the real gpt-oss (offline, one interact through `SandboxEnv`):
 | **`inj_empty`** (empty analysis block) | **0.96 s** | ✓ |
 
 Every wording fires (the tool is defined in the system prompt); they differ only in latency,
-and the injection is a ~3.5× throughput multiplier. The empty-analysis form is fastest, so it
-is our selected gpt-oss wording. A per-model probe picks it, because the second model uses a
-different chat format and — as it turns out — needs no collapse at all (§4.6).
+and the injection is a ~3.5× throughput multiplier. The empty-analysis form is fastest
+*offline* — but promoting it live **regressed the score 86.40 → 77.58** (§4.6): its empty
+reasoning block fires less reliably on the hosted serving than the public `inj_close` wording,
+so a latency-only selector chose a fragile template. We therefore keep the robust `inj_close`.
+A per-model probe still routes wording, because the second model uses a different chat format
+and — as it turns out — needs no collapse at all (§4.6).
 
 ### 4.6 Offline measurement harness (de-blinding), and the exhausted lever space
 
@@ -315,6 +319,17 @@ surface allows. Our public score (86.40) matches the strongest public notebooks;
 gap to the very top of the leaderboard is not attributable to any lever we could measure, and
 we believe it lies in the **private guardrail** — which returns no in-competition signal — or
 in run-to-run variance.
+
+**A caveat on the harness, learned the hard way.** The offline model is quantized (Q4 GGUF via
+llama.cpp) and served differently from the hosted evaluator, so it predicts *relative
+fire/no-fire* reliably but **not** fine-grained latency-to-score. Acting on an offline latency
+win — swapping the public `inj_close` wording for a measured-10%-faster empty-analysis form —
+*regressed* the live score from 86.40 to 77.58, because the faster wording fires less reliably
+at scale on the real serving. The lesson: **treat the offline harness as a discovery and
+sanity-check tool (does a mechanism work at all?), never as a fine optimizer, and prefer
+publicly-validated wordings whose live fire-rate is known.** This negative result is, for a
+security benchmark, a useful one: it shows how a proxy-model optimization loop can quietly
+select a *worse* live attack, which is itself a caution for automated red-teaming pipelines.
 
 ---
 
