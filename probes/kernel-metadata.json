@@ -1,0 +1,17 @@
+{
+  "id": "qwer556617123/ai-agent-security-probe",
+  "title": "AI Agent Security Probe",
+  "code_file": "probe.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": ["ai-agent-security-multi-step-tool-attacks"],
+  "model_sources": [
+    "llkh0a/gpt-oss-20b-gguf/PyTorch/default/1",
+    "llkh0a/gemma-4-26b-a4b-it-ud-q4-k-m-gguf/PyTorch/default/1"
+  ]
+}
