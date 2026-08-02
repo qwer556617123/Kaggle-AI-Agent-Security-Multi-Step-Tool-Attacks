@@ -70,14 +70,20 @@ def main() -> None:
             results[(label, gname)] = allowed
         print("%-36s" % label + "".join("%-13s" % ("%d/%d" % (c, N)) for c in cells))
     print("-" * 118)
-    print("Reading: G0=public baseline (should be 10/10). A column of 0/10 = that private")
-    print("hypothesis ZEROES the attack. G5 shows throughput collapse (allows first ~3).")
+    ze = ", ".join(sorted(pg.ZEROES_EVERYONE))
+    print("ZEROES-EVERYONE (no marker-exfil attack can EVER score -> gives no ranking signal ->")
+    print("a ranked competition cannot use it -> NOT a plausible private guardrail): %s" % ze)
+    print("So the RANKABLE hypotheses are the rest. attack_priv must cover THOSE.")
 
-    # Verdict summary per attack: which hypotheses each survives (>0).
-    print("\nSURVIVES (>0 allowed) — the measured bound:")
+    # Verdict per attack: which RANKABLE hypotheses each survives.
+    rankable = [g for g in gnames if g not in pg.ZEROES_EVERYONE]
+    print("\nSURVIVES among the %d RANKABLE hypotheses (%s):" % (len(rankable),
+          ", ".join(r.split("(")[0].replace("G", "") for r in rankable)))
     for label, modname, tname in SUBJECTS:
-        surv = [g for g in gnames if results[(label, g)] > 0]
-        print("  %-36s %s" % (label, ", ".join(s.split("(")[0] for s in surv)))
+        surv = [g for g in rankable if results[(label, g)] > 0]
+        tag = "  <= covers ALL rankable" if len(surv) == len(rankable) else ""
+        print("  %-36s %d/%d  %s%s" % (label, len(surv), len(rankable),
+              ", ".join(s.split("(")[0] for s in surv), tag))
 
 
 if __name__ == "__main__":
