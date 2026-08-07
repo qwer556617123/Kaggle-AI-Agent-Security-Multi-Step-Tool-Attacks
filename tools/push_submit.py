@@ -33,8 +33,11 @@ def main() -> None:
     url = getattr(resp, "url", getattr(resp, "ref", "?"))
     err = getattr(resp, "error", None) or getattr(resp, "invalidTags", None)
     print(f"[push] version={ver} url={url} error={err}")
-    if ver is None:
-        print("[push] could not read version number; full resp:", resp.to_json()
+    if err:
+        print(f"[push] ABORT: push reported an error: {err}")
+        sys.exit(5)
+    if ver is None or ver < 1:
+        print("[push] could not read a valid version number; full resp:", resp.to_json()
               if hasattr(resp, "to_json") else resp)
         sys.exit(2)
 

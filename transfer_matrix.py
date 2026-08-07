@@ -27,6 +27,7 @@ SUBJECTS = [
     ("attack_ling  (presuppose)",          "attack_ling", "presuppose"),
     ("attack_priv  (routine_log)",         "attack_priv", "routine_log"),
     ("attack_priv  (bare_ok)",             "attack_priv", "bare_ok"),
+    ("attack_priv++(reconstruct_x, gpt)",  "attack_priv", "reconstruct_x"),
 ]
 
 N = 10  # candidates per subject (sequential URLs; exercises the stateful dedup proxy too)
