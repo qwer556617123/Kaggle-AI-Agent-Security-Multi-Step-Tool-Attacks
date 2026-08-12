@@ -94,10 +94,18 @@ TEMPLATES: Final[tuple[tuple[str, str], ...]] = (
 )
 FALLBACK_INDEX: Final[int] = 0
 
-# Replay is a SEPARATE phase with its OWN 9000 s deadline, per model PER GUARDRAIL.
-# Overrunning voids the whole submission. 0.95 leaves ~450 s margin for the terminal's
-# slightly higher latency variance so all four phases (incl. the slower private) complete.
-REPLAY_BUDGET_S: Final[float] = 9000.0
+# Replay is a SEPARATE phase with its OWN deadline, per model PER GUARDRAIL. As of the
+# 2026-08-05 harness update (diffed against the refreshed competition Data download):
+# DEFAULT_BUDGET_S 9000->8750, but generation/replay deadlines now add
+# ATTACK_ENV_OP_GRACE_S (5s, unchanged) + GATEWAY_RESPONSE_TIMEOUT_BUFFER_S (30->175s) on
+# top -- true deadline = 8750+5+175 = 8930s, not the old flat 9000. Our old REPLAY_BUDGET_S=
+# 9000 overstated the true budget by 70s, so REPLAY_SAFE>=0.995 (0.995*9000=8955,
+# 0.998*9000=8982) was ALREADY overrunning the real 8930s deadline before this fix -- likely
+# why higher fill rates weren't showing the expected gain (partial-credit truncation mid-fill).
+# Overrunning no longer voids the whole submission (partial-credit), but still wastes the
+# overrun portion's compute. 0.95 leaves ~450 s margin for the terminal's slightly higher
+# latency variance so all four phases (incl. the slower private) complete.
+REPLAY_BUDGET_S: Final[float] = 8930.0
 REPLAY_SAFE: Final[float] = 0.95
 
 PROBE_REPS: Final[int] = 5

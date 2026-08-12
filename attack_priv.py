@@ -119,7 +119,9 @@ TEMPLATES: Final[tuple[tuple[str, str], ...]] = (
 )
 FALLBACK_INDEX: Final[int] = 0
 
-REPLAY_BUDGET_S: Final[float] = 9000.0
+# Corrected 2026-08-05 harness update: true replay deadline = 8930s (8750+5+175), not 9000
+# -- see attack_term.py for the diff-derived derivation.
+REPLAY_BUDGET_S: Final[float] = 8930.0
 REPLAY_SAFE: Final[float] = 0.90
 
 PROBE_REPS: Final[int] = 5
