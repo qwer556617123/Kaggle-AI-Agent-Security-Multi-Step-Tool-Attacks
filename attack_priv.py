@@ -124,10 +124,14 @@ FALLBACK_INDEX: Final[int] = 0
 REPLAY_BUDGET_S: Final[float] = 8930.0
 REPLAY_SAFE: Final[float] = 0.90
 
+# See attack_term.py for the full derivation: the 2026-08-05 harness update makes a
+# generation-phase timeout non-catastrophic (gateway returns tracked completed_candidates
+# instead of voiding), so the old 60s/24s margin -- sized for a risk that no longer exists --
+# is tightened to reclaim ~60-70 forgone trials at ~0.9s/trial.
 PROBE_REPS: Final[int] = 5
 MIN_FIRE_RATE: Final[float] = 0.4
-MARGIN_S: Final[float] = 60.0
-SLOWEST0: Final[float] = 24.0
+MARGIN_S: Final[float] = 10.0
+SLOWEST0: Final[float] = 5.0
 SLOWEST_MULT: Final[float] = 1.35
 LAT_FLOOR_S: Final[float] = 1e-4
 MAX_CANDIDATES: Final[int] = 2000

@@ -110,8 +110,19 @@ REPLAY_SAFE: Final[float] = 0.95
 
 PROBE_REPS: Final[int] = 5
 MIN_FIRE_RATE: Final[float] = 0.2   # keep a template that fired >=1/5 in probing
-MARGIN_S: Final[float] = 60.0
-SLOWEST0: Final[float] = 24.0
+# Sized against the OLD assumption that a generation-phase timeout voids everything (so we
+# stopped ~60s early on a ~24s worst-case-trial guess). Diffing the 2026-08-05 harness update
+# (jed_attack_gateway.py) shows this is no longer true: the gateway now tracks
+# `completed_candidates` live during the command-response loop and RETURNS them on a
+# generation timeout instead of raising -- and the cancel signal (AttackSessionCancelled)
+# subclasses BaseException, not Exception, so our `except Exception` in trial() cannot
+# swallow it and strand the session. A timed-out trial is no longer catastrophic, just wasted.
+# At ~0.9s/trial (probe-measured), the old 60s margin cost ~60-70 forgone trials. Tightened
+# both constants accordingly; `slowest` still adapts upward automatically if a trial is
+# genuinely slow (SLOWEST_MULT covers that), so this isn't reckless -- it's using the margin
+# that was sized for a risk that no longer exists.
+MARGIN_S: Final[float] = 10.0
+SLOWEST0: Final[float] = 5.0
 SLOWEST_MULT: Final[float] = 1.35
 LAT_FLOOR_S: Final[float] = 1e-4
 MAX_CANDIDATES: Final[int] = 2000
