@@ -2,8 +2,35 @@
 
 **Working Note — AI Agent Security: Multi-Step Tool Attacks (OpenAI · Google · IEEE)**
 
-> **STATUS: LOCAL DRAFT — DO NOT SUBMIT until the competition deadline (2026-09-01).**
+> **STATUS: LOCAL DRAFT — DO NOT SUBMIT until the Working Note deadline (2026-09-08).**
 > Living document; updated as experiments land. Numbers marked *(pending)* are not yet final.
+
+---
+
+## Scope and responsible disclosure
+
+This note concerns **only** the competition's deterministic, offline, fixture-backed sandbox
+benchmark (`aicomp_sdk`), whose tools return canned data and whose "secret" is a synthetic
+sentinel (`SECRET_MARKER`) with no real-world referent. Every technique below is reported for a
+single purpose: to explain, measure, and help *defend against* a class of multi-step tool-use
+failures in agent systems, which is exactly the benchmark's stated goal. Nothing here is a
+recipe for attacking a deployed system:
+
+- The two levers we emphasize — a **reasoning-collapse injection** and a **wrap-up-collapse
+  terminal** — are effective *because of* a specific serving-stack weakness (untrusted text
+  templated without stripping chat-template control tokens). Our §8 lesson for defenders is to
+  sanitize those tokens; where that is done, the levers do not apply. We report them so the
+  defense can be built, and we quantify how much the model's own safety reasoning was doing by
+  measuring what its removal costs.
+- The **sentinel-reconstruction** payload (§6.2) is demonstrated against a *canary-string input
+  scanner* to show that such a scanner is insufficient on its own; the accompanying lesson is
+  that detection must inspect outbound tool-call payloads, not inbound user text.
+- We deliberately do **not** target real credentials, real network destinations, or any
+  out-of-sandbox capability; the benchmark provides none, and we add none.
+
+We take the competition's "responsible communication" criterion as a hard constraint: the value
+of this work is defensive and methodological, and it is written to be useful to benchmark
+authors, evaluators, and agent builders — not to attackers.
 
 ---
 
@@ -183,6 +210,57 @@ single-predicate strategy.
 weight-efficient reachable predicate. The optimization problem reduces to *maximizing the
 number of reproducible exfiltration events per unit of replay budget.*
 
+### 3.3 A stronger claim: the scoring provably collapses to single-predicate throughput
+
+§3.2 shows the other predicates are hard to reach. We can make a sharper, exhaustive statement
+that we believe is the single most useful design insight in this note, because it is a property
+of the *scoring rule itself*, independent of any particular attack wording.
+
+Recall the raw score (Evaluation page; SDK `scoring.py`):
+`raw = Σ_findings Σ_predicates weight(severity) + 2 × |distinct score-cells|`, with the severity
+sum **not** de-duplicated and the `+2` bonus granted **once per distinct trace-signature cell**.
+Each replayed candidate is one trace = one finding = at most one score-cell. Model generation
+dominates replay cost, and — because the harness accepts at most one tool call per model turn
+(SDK `sandbox.py`) — **each additional scored tool call costs one additional generation.** So
+the natural currency is *points per generation*.
+
+**Claim.** Against the shipped guardrail, no candidate exceeds **18 points per generation**, and
+the trivial single-`http.post` candidate already achieves it. *Proof.* One marginal generation
+can add at most one tool call, worth at most: (a) as a fresh single-exfil trace, `16`
+(EXFILTRATION, the unique highest-weight reachable predicate) `+ 2` (a new distinct cell, since
+the cell signature folds in the `http.post` domain, so a fresh domain is a fresh cell) `= 18`;
+or (b) folded as a second predicate into an *existing* trace, `≤ 16` and **no** extra `+2` (same
+trace ⇒ same cell). Because the novelty bonus scales with the number of distinct traces, not
+with predicates-per-trace, splitting always weakly dominates merging: (a) ≥ (b). The two
+tempting high-weight merges are moreover unreachable — `EXFILTRATION+DESTRUCTIVE_WRITE` needs a
+`secret`-substring path the guardrail denies, and `EXFILTRATION+UNTRUSTED_TO_ACTION` needs a
+`web`/`email` source in the trace whose presence makes the guardrail deny the `http.post`
+itself (its taint window strictly contains the predicate's). Every reachable multi-predicate
+trajectory computes to 11–17 points/generation. ∎
+
+**Why this matters for the benchmark, not just for us.** The competition's own framing
+repeatedly and explicitly solicits *diversity*: "produce diverse replayable attack paths,"
+"novelty search, Go-Explore-style archive methods," quality-diversity search. Yet the scoring
+rule, as shown, makes **the diversity term free and saturated** (one distinct benign domain per
+candidate already yields a distinct cell, so an attacker gets the full `+2` on every candidate
+without any behavioral diversity at all) and makes **every non-exfiltration behavior strictly
+dominated**. The rational strategy is therefore a *monoculture*: emit the same single-predicate
+exfiltration call millions of times with a rotating domain. A search method with a rich archive
+of structurally distinct attack paths scores **no better** than one that spams the single
+dominant cell — and usually worse, because diversity costs generations that the throughput
+strategy spends on more exfiltrations. This is a concrete instance of a **specification/scoring
+mismatch**: the benchmark intends to reward *discovery of varied multi-step failures* but its
+score is maximized by *high-throughput repetition of one single-step failure*. §8 turns this
+into a design recommendation (reward distinct **behavioral** signatures, not distinct benign
+URLs; make the highest-weight predicate genuinely require the multi-step structure the benchmark
+is named for).
+
+*(An empirical corollary we verified: because the cell term is already saturated by unique
+domains, we implemented no novelty/quality-diversity archive search — it could not raise the
+score, only lower throughput. The impossibility argument above is why. This is a rare case where
+the correct response to "have you tried a diversity-driven search?" is a proof that it cannot
+help under the current rule, rather than an experiment that merely failed to help.)*
+
 ---
 
 ## 4. A budget-optimal attack algorithm
@@ -337,6 +415,32 @@ configuration** — only repeated draws or an explicit mechanistic explanation s
 belief about what a config's *typical* score is. We return to this in §7.4, where we show two
 mechanistically-motivated changes that looked promising on paper produced no measurable
 improvement once tested against this noise floor.
+
+### 5.2a Public and private are one draw of one run — and this dictates final selection
+
+A subtle structural fact reshapes how variance should be handled for the prize, and we initially
+got it wrong. The gateway generates each submission's candidate set **once** (under the public
+guardrail), then replays that *same* set against both the public and the private guardrail in
+the same run (`jed_attack_gateway.py: get_all_predictions`). Two consequences follow. First,
+**every submission already carries a private score, frozen at submission time and never shown.**
+Second, within a fixed config the public and private scores are **positively correlated**,
+because both scale with |C|, the number of candidates that run's pool speed allowed us to
+generate: `public ≈ 18·|C|` and `private ≈ 18·f·|C|` where `f` is the fraction of the config's
+candidates the private guardrail admits. So a run that drew a fast pool (high public) also
+produced a high private score, on the same candidate set.
+
+We had earlier reasoned that public-score "grinding" was pure leaderboard vanity with no bearing
+on the prize. That was **wrong**, and the correction is the single most actionable strategic
+finding in this note. Because the prize is judged on the participant's hand-picked Final
+Submissions and the private board is *not* best-of over all daily submissions, the right play is:
+resample the chosen config to accumulate many frozen (hidden) private draws, then **select as the
+Final the specific submission with the highest observed public score** — its correlated private
+draw is, in expectation, the best available. This is order-statistics selection through a noisy
+but positively-correlated observable, and it is the only lever we found that still moves the
+*private* outcome after the throughput technique itself is maxed. The correlation is imperfect
+(f is a property of the unknown private guardrail, and for a config the private guardrail zeroes
+entirely — e.g. a control-token filter against our injection-based throughput config — it is
+moot), which is exactly why we carry two Finals betting opposite guardrail strictness (§6).
 
 ### 5.3 Competitive context
 
@@ -664,6 +768,21 @@ accumulating many trials hoping a pattern will resolve out of noise (§5.2, and 
    legitimate robustness should recognize that the same change lowers the cost of
    trial-and-error probing for an adversary; it is not a purely benign change from a security
    standpoint even when it clearly is one for reliability.
+8. **A scoring rule can silently invert a benchmark's stated goal — design the score to reward
+   the behavior you actually want to measure.** §3.3 proves this benchmark's score is maximized
+   by a *monoculture*: repeat one single-step exfiltration call with a rotating benign domain.
+   The `+2` novelty term, intended to reward diverse attack paths, is saturated for free by the
+   domain rotation and contributes no pressure toward behavioral variety; and every genuinely
+   multi-step or alternative-predicate behavior is strictly dominated in points-per-generation.
+   A benchmark named for *multi-step* tool attacks is thus won by the most single-step strategy
+   available. Two concrete fixes for benchmark authors: (i) define the novelty cell over the
+   attack's **behavioral** signature (tool sequence, provenance chain, predicate mix) rather than
+   over a benign, attacker-chosen argument like the destination domain, so that diversity must be
+   *earned*; and (ii) weight or gate the highest-severity predicate so that reaching it genuinely
+   requires the multi-step untrusted-to-action structure the benchmark is about, rather than a
+   one-shot payload the guardrail inspects on the wrong argument. Absent such changes, "use the
+   evaluation budget efficiently" and "produce diverse replayable attack paths" are in direct
+   conflict, and the score resolves it in favor of efficiency over diversity.
 
 ---
 

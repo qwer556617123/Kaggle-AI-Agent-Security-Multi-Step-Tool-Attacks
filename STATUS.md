@@ -18,6 +18,46 @@ Both finals are **best-of protected**: nothing described below can lower either 
 official Final Submission selection (up to 2, for private-leaderboard judging) has not been
 locked yet — do that before 2026-09-01.
 
+## Finals-selection pool (post-08-05) — the last real prize lever
+
+**Key mechanic (verified from `jed_attack_gateway.py get_all_predictions`):** each submission is
+scored against the public AND private guardrails in ONE run, on the SAME candidate set (generated
+once under the public guardrail). So within a config, `private ≈ transfer_fraction × public` —
+both scale with |C|, the candidates the pool let us generate that run. Every submission's private
+score is therefore **frozen at submission time and hidden**, and its public score is a
+positively-correlated observable proxy. **Selecting the highest-public post-rewrite instance of
+each Final config maximizes its hidden private draw** (order statistics). This corrects our
+earlier "public grinding is vanity for private" belief — the grind manufactures the pool of
+frozen private draws we then select the luckiest of. Only post-08-05 submissions are eligible
+(the rewrite invalidated the old leaderboard).
+
+**Throughput pool (Final-1 = argmax-public here):**
+
+| ref | public | config |
+|-----|--------|--------|
+| **55412934** | **88.740** | term_after@0.99 ← current best Final-1 |
+| 55459728 | 87.660 | term_after@0.99 (corrected budget) |
+| 55370531 | 87.615 | term_after@0.998 |
+| 55370500 | 87.165 | term_after@0.995 |
+| 55354539 / 55438927 | 87.075 | term_after@0.99 / @0.995 |
+| 55412951 | 86.670 | term_after@0.998 |
+| 55606854 | 88.245 | term_after@0.99 resample (08-18) — 2nd best, just under |
+| … | 73.2–86.4 | various fill/margin + 55606862=85.455 (see submissions API) |
+| 55625549 / 55625565 | *pending* | term_after@0.99 resamples (2026-08-19) |
+
+**Coverage-hedge pool (Final-2 = argmax-public among `attack_priv++` = 6/6 rankable):**
+
+| ref | public | config |
+|-----|--------|--------|
+| **55321811** | **46.470** | attack_priv++ (6/6 coverage) ← current best Final-2 |
+| 55551225 | 46.255 | attack_priv++ (tightened margin) |
+| 55354552 | 45.620 | attack_priv (plain, 5/6 — do NOT pick over ++) |
+| 55606873 | 46.080 | attack_priv++ resample (08-18) |
+| 55625574 | *pending* | attack_priv++ resample (2026-08-19) |
+
+**Action before Sept 1:** keep resampling both configs on idle daily quota; at selection time pick
+the argmax-public ref of each (currently 55412934 + 55321811) and lock them in the Kaggle UI.
+
 **Public score progression (pre-rewrite):** 4.41 → 34.68 → 44.5 → 55 → 61.97 → 64.44 → 86.40 →
 90.09 → **91.40**. Post-rewrite clean draws (§ below) cluster 82.8–87.7 for the same throughput
 config — read this as GPU-lottery variance around a similar mean, not a regression; see
