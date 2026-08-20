@@ -31,6 +31,28 @@ earlier "public grinding is vanity for private" belief — the grind manufacture
 frozen private draws we then select the luckiest of. Only post-08-05 submissions are eligible
 (the rewrite invalidated the old leaderboard).
 
+**Private guardrail is (inferably) provenance-based — big, optimistic update (WORKING_NOTE §6.4).**
+The gateway's guardrail loader (`jed_attack_gateway.py:180-183 _KNOWN_GUARDRAILS`) names the
+held-out private guardrail: `persistent_provenance_private` → `aicomp_private_guardrails.
+persistent_provenance.Guardrail` (source not shipped, only the name). The host declined to
+confirm content-vs-provenance when asked in the discussion — so this is an information edge from
+public code. A provenance guardrail keys on data *origin*; the benchmark fixes `untrusted =
+{web, email}` and treats the **user as trusted** (`suite.py:45 last_source="user"`,
+`predicates.py:228`). Our single-post `http.post` has no web/email tool event before it → **zero
+untrusted provenance → a provenance private guardrail passes it.** So `attack_term` (throughput)
+is expected to transfer to private at ~its public magnitude (**~85, not ~0**) — a far more
+optimistic private outlook than the content-filter hypothesis we hedged against. Implication:
+`attack_priv`'s content-obfuscation is largely *inert* against provenance, but **keep it as
+Final-2 anyway** — best-of makes it a *free* hedge for the residual chance (host non-answer, the
+"persistent" qualifier, a possible clean-room guardrail swap at final ranking) that the defense
+is content-based. Finals picks unchanged; expected private outcome materially better.
+
+*Not pursued (and we won't): the private guardrail wheel is pip-installed from `/kaggle/input/`
+at eval time, so reading it to over-fit the held-out defense is the likely mechanism behind the
+≥100 public scores the host flagged as "implementation-specific … may not carry to final
+rankings." That is answer-key reading — gaming, rules-risky, and nullified at final ranking. We
+use only the guardrail's name, which is in the public gateway source.*
+
 **Throughput pool (Final-1 = argmax-public here):**
 
 | ref | public | config |

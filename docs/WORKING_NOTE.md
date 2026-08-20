@@ -621,6 +621,58 @@ an open gap rather than papering over it with a proxy we know is unrepresentativ
 strongest defensible claim is coverage of every guardrail hypothesis compatible with the
 competition being rankable at all, not coverage of every guardrail we could imagine.
 
+### 6.4 The private guardrail is (inferably) provenance-based — and provenance has a blind spot for the trusted user
+
+The proxy matrix hedges across guardrail *hypotheses*, but the public evaluation code narrows
+the hypothesis space more than we first used. The gateway's guardrail loader carries a
+fallback mapping naming the held-out private guardrail directly: its identifier is
+`persistent_provenance_private`, resolving to a `Guardrail` class in an
+`aicomp_private_guardrails.persistent_provenance` module (the source of which is not shipped in
+the SDK — only the name is). The name is informative: it indicates a **provenance / data-flow**
+defense, not a content/pattern scanner. This matters because when a competitor asked the host
+directly whether the private guardrail was "primarily content-based / primarily
+provenance-based / both / can't say," the host declined to specify — so the classification is
+*inferable from the public gateway code but not otherwise disclosed*.
+
+A provenance guardrail decides by asking *where the data in a dangerous action came from*, and
+the benchmark fixes that vocabulary at the source level: the tool suite marks web reads as
+source `web`, email reads as `email`, file reads as `file`, and — crucially — the **default
+source of anything the user supplies is `user`**, which the predicate layer explicitly treats
+as *trusted* (`untrusted = {web, email}`). Our throughput attack is a single `http.post` whose
+payload the user's own message supplies, with **no preceding web/email tool event** in the
+trajectory. It therefore carries **no untrusted provenance**, and a provenance guardrail — of
+any strictness that still lets *some* attack score, i.e. that does not simply taint the user and
+zero the entire field — must allow it. In other words, the same property that lets our attack
+pass the *public* `OptimalGuardrail` (no taint to trip) is the property that should carry it
+through a *provenance-based private* guardrail as well.
+
+This yields a genuine security insight, and it is uncomfortable for the provenance-defense
+paradigm: **a data-flow guardrail cannot stop exfiltration that a trusted principal directly
+requests.** Provenance tracks the *origin* of data, not the *legitimacy of the intent* moving
+it; when the human user is the origin and is trusted by construction, a user-authored
+"exfiltrate this marker" instruction has impeccable provenance and sails through. The
+benchmark's entire threat model — "untrusted content leads to unsafe action" — has a structural
+complement it does not score: "trusted user directly commands the unsafe action." In a
+deployment this is not hypothetical: a compromised user session, a confused-deputy front-end, or
+a prompt-injected *upstream* system that the guardrail happens to label `user` rather than `web`
+all collapse into this blind spot. A defense that is serious about exfiltration cannot rely on
+provenance alone; it must also gate the outbound sink on the *content* leaving it (§8, lessons 1
+and 6) — precisely the pairing the public guardrail failed to implement and the private one, if
+purely provenance-based, also would not.
+
+For our own finals selection the consequence is concrete and was initially counter-intuitive:
+the injection-free, content-obfuscating machinery of §6.1–6.2 is aimed at a *content* scanner
+and is largely **inert against a provenance guardrail**, which does not read message content at
+all. Under a provenance private guardrail our *throughput* configuration is expected to transfer
+at roughly its public magnitude, not to zero — a materially more optimistic private outlook than
+a content-filter hypothesis would imply. We nonetheless keep a content-robust hedge as one of
+the two Final Submissions: because the private board takes the better of the two, the hedge is
+free insurance against the residual possibility (the host's non-answer, the undisclosed
+"persistent" qualifier, and a possible clean-room guardrail swap at final ranking all keep that
+possibility alive) that the held-out defense is content-based after all. The correct posture is
+not to over-fit to the inferred provenance mechanism, but to let best-of carry a small bet on
+the alternative while the primary final maximizes the provenance-passing throughput.
+
 ---
 
 ## 7. Verifying against a moving target: the 2026-08-05 harness update
