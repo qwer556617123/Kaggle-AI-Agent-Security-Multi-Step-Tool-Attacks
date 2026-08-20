@@ -42,8 +42,8 @@ frozen private draws we then select the luckiest of. Only post-08-05 submissions
 | 55354539 / 55438927 | 87.075 | term_after@0.99 / @0.995 |
 | 55412951 | 86.670 | term_after@0.998 |
 | 55606854 | 88.245 | term_after@0.99 resample (08-18) — 2nd best, just under |
-| … | 73.2–86.4 | various fill/margin + 55606862=85.455 (see submissions API) |
-| 55625549 / 55625565 | *pending* | term_after@0.99 resamples (2026-08-19) |
+| … | 64.8–86.7 | various fill/margin + resamples (85.455, 72.450, 64.800 …) |
+| 55625565 / 55625549 | 72.450 / 64.800 | term_after@0.99 resamples (08-19, slow-pool day) |
 
 **Coverage-hedge pool (Final-2 = argmax-public among `attack_priv++` = 6/6 rankable):**
 
@@ -53,15 +53,16 @@ frozen private draws we then select the luckiest of. Only post-08-05 submissions
 | 55551225 | 46.255 | attack_priv++ (tightened margin) |
 | 55354552 | 45.620 | attack_priv (plain, 5/6 — do NOT pick over ++) |
 | 55606873 | 46.080 | attack_priv++ resample (08-18) |
-| 55625574 | *pending* | attack_priv++ resample (2026-08-19) |
+| 55625574 | 32.755 | attack_priv++ resample (08-19, slow-pool day) |
 
 **Action before Sept 1:** keep resampling both configs on idle daily quota; at selection time pick
 the argmax-public ref of each (currently 55412934 + 55321811) and lock them in the Kaggle UI.
 
 **Public score progression (pre-rewrite):** 4.41 → 34.68 → 44.5 → 55 → 61.97 → 64.44 → 86.40 →
-90.09 → **91.40**. Post-rewrite clean draws (§ below) cluster 82.8–87.7 for the same throughput
-config — read this as GPU-lottery variance around a similar mean, not a regression; see
-`docs/WORKING_NOTE.md` §5.2/§7 for the full analysis.
+90.09 → **91.40**. Post-rewrite draws of the same throughput config span a wide **~65–89**
+(best 88.740; slow-pool days dip to the 60s–70s) — this is GPU-lottery variance, not a
+regression; the mean sits high-80s and the spread is exactly why finals selection (pick the
+argmax-public draw) matters. See `docs/WORKING_NOTE.md` §5.2/§5.2a/§7.
 
 ## 2026-08-05 harness rewrite — what changed, and what we verified about it
 

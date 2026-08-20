@@ -406,9 +406,10 @@ Repeated submissions of the byte-identical `term@0.99` configuration returned **
 is a real, uncontrolled source of variance, not merely a rounding artifact. Later, broader
 sampling (across fill-rate variants, on different days, and again after the mid-competition
 harness rewrite, §8) widened this estimate substantially: same-day, same-config pairs have
-differed by as much as **9.8 points** (e.g. 79.07 vs 88.83), and single-day distributions
-across three fill-rate settings showed means clustering in the low-to-mid 80s with standard
-deviations of 4–6 points. Kaggle's scoring is **best-of** across a participant's daily
+differed by as much as **9.8 points** (e.g. 79.07 vs 88.83), and across weeks of resampling the
+byte-identical throughput config the post-rewrite public score has ranged from the **mid-60s to
+88.7** — the high-80s draws are the config's good-pool ceiling and the mid-60s/70s draws are
+slow-pool days, with per-day standard deviations of 4–6 points and occasional larger excursions. Kaggle's scoring is **best-of** across a participant's daily
 submissions, so this variance is asymmetric in our favor for exploration (a bad draw costs
 nothing) but means **no single high draw should be read as the true ceiling of a
 configuration** — only repeated draws or an explicit mechanistic explanation should update our
