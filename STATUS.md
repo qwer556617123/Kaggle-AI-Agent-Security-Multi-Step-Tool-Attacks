@@ -47,6 +47,19 @@ Final-2 anyway** — best-of makes it a *free* hedge for the residual chance (ho
 "persistent" qualifier, a possible clean-room guardrail swap at final ranking) that the defense
 is content-based. Finals picks unchanged; expected private outcome materially better.
 
+**Free egress-robustness upgrade to Final-1 (2026-08-21).** A realistic provenance/DLP defense
+often pairs provenance with *egress control* — allow internal destinations, block external
+(a sensible exfil policy). `attack_term` posted to external `.co`; `attack_priv` already uses
+`.internal`. Since the EXFIL predicate ignores the destination and the http.post tool blocks only
+RFC1918 IPs/localhost (`PRIVATE_NET_RE`), not the `.internal` TLD, switching `attack_term` to
+`.internal` costs **zero** public score and adds robustness to that egress axis while keeping full
+throughput and provenance-passing. Done: `attack_term.py URL_TLD ".co" → ".internal"`, Mode-A
+PASS, resampling the internal-domain config (refs 55676665/55676678, pending). The two finals now
+hedge three axes: provenance (both pass, untainted), egress (both internal), content/token
+(attack_priv injection-free — the one axis attack_term can't cover without losing throughput).
+Old `.co` high draws (55412934=88.740) remain valid finals; new `.internal` draws are strictly
+preferred once one lands at comparable public score.
+
 *Not pursued (and we won't): the private guardrail wheel is pip-installed from `/kaggle/input/`
 at eval time, so reading it to over-fit the held-out defense is the likely mechanism behind the
 ≥100 public scores the host flagged as "implementation-specific … may not carry to final
