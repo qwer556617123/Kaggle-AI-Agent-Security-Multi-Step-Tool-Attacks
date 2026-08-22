@@ -54,11 +54,17 @@ often pairs provenance with *egress control* — allow internal destinations, bl
 RFC1918 IPs/localhost (`PRIVATE_NET_RE`), not the `.internal` TLD, switching `attack_term` to
 `.internal` costs **zero** public score and adds robustness to that egress axis while keeping full
 throughput and provenance-passing. Done: `attack_term.py URL_TLD ".co" → ".internal"`, Mode-A
-PASS, resampling the internal-domain config (refs 55676665/55676678, pending). The two finals now
-hedge three axes: provenance (both pass, untainted), egress (both internal), content/token
-(attack_priv injection-free — the one axis attack_term can't cover without losing throughput).
-Old `.co` high draws (55412934=88.740) remain valid finals; new `.internal` draws are strictly
-preferred once one lands at comparable public score.
+PASS. **Confirmed zero-cost:** internal-domain draws scored **86.445 / 87.210** (refs
+55676665 / **55676678**) — same band as `.co`. The two finals now hedge three axes: provenance
+(both pass, untainted), egress (both internal), content/token (attack_priv injection-free — the
+one axis attack_term can't cover without losing throughput).
+
+**Preferred Final-1 is now the internal-domain draw `55676678` (87.210), not the `.co` 88.740
+(55412934).** Reason: `.internal` dominates on *expectation* — under pure provenance both pass and
+88.740 is marginally higher, but under provenance+egress `.co`→0 while `.internal`→~87; the
+crossover is at only ~2% egress-filter probability, well below any reasonable estimate. Keep
+resampling the `.internal` config (55689327/346/363, pending) to push its argmax toward/above
+88.7; the `.co` 88.740 stays a valid backup final.
 
 *Not pursued (and we won't): the private guardrail wheel is pip-installed from `/kaggle/input/`
 at eval time, so reading it to over-fit the held-out defense is the likely mechanism behind the
@@ -66,12 +72,15 @@ at eval time, so reading it to over-fit the held-out defense is the likely mecha
 rankings." That is answer-key reading — gaming, rules-risky, and nullified at final ranking. We
 use only the guardrail's name, which is in the public gateway source.*
 
-**Throughput pool (Final-1 = argmax-public here):**
+**Throughput pool (Final-1 = argmax-public *among internal-domain* draws; `.co` draws are backup):**
 
 | ref | public | config |
 |-----|--------|--------|
-| **55412934** | **88.740** | term_after@0.99 ← current best Final-1 |
-| 55459728 | 87.660 | term_after@0.99 (corrected budget) |
+| **55676678** | **87.210** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust) |
+| 55676665 | 86.445 | term_after@0.99 .internal |
+| 55689327/346/363 | *pending* | term_after@0.99 .internal resamples (08-22) |
+| 55412934 | 88.740 | term_after@0.99 **.co** — highest public, backup final (egress-fragile) |
+| 55459728 | 87.660 | term_after@0.99 .co (corrected budget) |
 | 55370531 | 87.615 | term_after@0.998 |
 | 55370500 | 87.165 | term_after@0.995 |
 | 55354539 / 55438927 | 87.075 | term_after@0.99 / @0.995 |
