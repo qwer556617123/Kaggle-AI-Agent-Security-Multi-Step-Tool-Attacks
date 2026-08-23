@@ -76,9 +76,9 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| **55676678** | **87.210** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust) |
-| 55676665 | 86.445 | term_after@0.99 .internal |
-| 55689327/346/363 | *pending* | term_after@0.99 .internal resamples (08-22) |
+| **55689327** | **87.570** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust) |
+| 55676678 | 87.210 | term_after@0.99 .internal |
+| 55689363 / 55676665 / 55689346 | 86.850 / 86.445 / 86.130 | term_after@0.99 .internal (mean ~86.8) |
 | 55412934 | 88.740 | term_after@0.99 **.co** — highest public, backup final (egress-fragile) |
 | 55459728 | 87.660 | term_after@0.99 .co (corrected budget) |
 | 55370531 | 87.615 | term_after@0.998 |
