@@ -66,6 +66,24 @@ crossover is at only ~2% egress-filter probability, well below any reasonable es
 resampling the `.internal` config (55689327/346/363, pending) to push its argmax toward/above
 88.7; the `.co` 88.740 stays a valid backup final.
 
+**Independent corroboration + a stronger hypothesis, checked and excluded (2026-08-24).**
+Discussion 736099 (`cm391`) independently identified the same guardrail ID
+(`persistent_provenance_private`) by reading the same public gateway code — two independent
+readings agreeing is stronger evidence than either alone. They also tested a harsher hypothesis:
+dangerous-pattern substring check applied to **all** tool arguments (not just the first key,
+i.e. fixing the exact bug our exfil relies on), plus an email-domain allowlist. We already model
+"all-args pattern check" as proxy `G1_check_data` in `transfer_matrix.py`, and it was *already*
+proven to zero every possible marker-exfil attack (`SECRET_MARKER`.lower() contains the substring
+`"secret"`, so any compliant exfil trips its own data field) — a guardrail with that property
+gives no ranking signal and is excluded from "rankable" by our own §6.1 argument. `cm391`'s own
+reported result (0.0 for their mock) is fully explained by their mock literally doing this — a
+self-consistency check on their own guardrail, not new evidence about the real one. The genuinely
+informative part of their post is that the **real** LB score pattern resembled their *allowing*
+("optimal") mock, not their *blocking* ("persistent_provenance_private") mock — weak, small-N,
+but directionally supportive of our provenance-only reading. Re-ran `transfer_matrix.py`:
+`attack_term` (now `.internal`) improved to **4/6** rankable (was 3/6 with `.co`), confirming the
+egress fix helped in the offline model too, not just live.
+
 *Not pursued (and we won't): the private guardrail wheel is pip-installed from `/kaggle/input/`
 at eval time, so reading it to over-fit the held-out defense is the likely mechanism behind the
 ≥100 public scores the host flagged as "implementation-specific … may not carry to final
