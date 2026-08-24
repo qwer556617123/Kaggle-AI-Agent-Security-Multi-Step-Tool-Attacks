@@ -399,6 +399,23 @@ variants at ~0.53 s); what actually drives hop-1's cost is how *decisively* the 
 finalize, and an under-specified instruction makes the model hesitate longer, not less. The
 practical rule this suggests: **optimize instruction clarity, not instruction length.**
 
+A second, distinct hypothesis raised independently in the competition's discussion forum —
+"prompt *language*," not prompt length — asks whether a non-English wording reaches the same
+tool call faster, since token-per-character efficiency varies by language and model. We tested
+it directly on gpt-oss: a Simplified-Chinese translation of the live champion instruction, and
+the same translation with the robustness-framing wording added, both against the identical
+English baseline. Both Chinese variants fired reliably (6/6, matching the English baseline's
+fire rate — this is not the `inj_empty`-style reliability trap of §5.5, since nothing here
+degrades fire rate) but were **slower**, not faster (+2.5% total latency each), with the entire
+gap in hop-0 (prefill/tokenization of the instruction itself); hop-1 (wrap-up decode) was
+language-invariant. An ultra-terse Chinese variant, mirroring a community suggestion to try
+compressing the instruction further, failed to fire at all (0/6) — the model no longer parsed it
+as an instruction. Both results independently reproduce this section's finding on a second axis:
+this is an English-centric model (unsurprising for GPT-family weights), clarity dominates over
+either character count or the language used to express it, and compressing an already-clear
+instruction trades reliability for no latency gain. We report this as a direct, measured answer
+to an open community question rather than leaving it speculative.
+
 ### 5.2 GPU-lottery variance: larger than initially estimated, and why best-of matters
 
 Repeated submissions of the byte-identical `term@0.99` configuration returned **90.09, 90.72,
