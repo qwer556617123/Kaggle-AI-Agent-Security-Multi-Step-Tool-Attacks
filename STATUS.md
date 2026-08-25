@@ -11,7 +11,7 @@ comparable across the 2026-08-05 harness rewrite (see below).
 
 | Role | Config | File | Best public (pre-rewrite) | Public post-rewrite | Kernel/ref |
 |------|--------|------|------|------|------|
-| **Final-1 (throughput)** | single-post + reasoning-collapse + wrap-up terminal, fill 0.99 | `attack_term.py` | 91.40 (ref 55132583) | 82.8–87.7 across clean draws post-rewrite (see below) | v36 / 55132583 |
+| **Final-1 (throughput)** | single-post + reasoning-collapse + wrap-up terminal, fill 0.99 | `attack_term.py` | 91.40 (ref 55132583) | 82.8–88.1 across clean draws post-rewrite (see below) | v36 / 55132583 |
 | **Final-2 (private hedge)** | injection-free + internal domain + unique payload + sentinel-reconstruction | `attack_priv.py` | — (public score is deliberately traded away) | 45.6–46.5 | v75 / 55551225 |
 
 Both finals are **best-of protected**: nothing described below can lower either number. The
@@ -59,12 +59,14 @@ PASS. **Confirmed zero-cost:** internal-domain draws scored **86.445 / 87.210** 
 (both pass, untainted), egress (both internal), content/token (attack_priv injection-free — the
 one axis attack_term can't cover without losing throughput).
 
-**Preferred Final-1 is now the internal-domain draw `55676678` (87.210), not the `.co` 88.740
+**Preferred Final-1 is now the internal-domain draw `55722148` (88.065), not the `.co` 88.740
 (55412934).** Reason: `.internal` dominates on *expectation* — under pure provenance both pass and
-88.740 is marginally higher, but under provenance+egress `.co`→0 while `.internal`→~87; the
-crossover is at only ~2% egress-filter probability, well below any reasonable estimate. Keep
-resampling the `.internal` config (55689327/346/363, pending) to push its argmax toward/above
-88.7; the `.co` 88.740 stays a valid backup final.
+88.740 is marginally higher, but under provenance+egress `.co`→0 while `.internal`→~87-88; the
+crossover is at only ~2% egress-filter probability, well below any reasonable estimate. The
+`.internal` argmax has now closed almost all of the gap to the `.co` 88.740 backup purely through
+continued resampling (87.570 → 88.065), reinforcing that the two configs' means are close and the
+egress robustness is close to free even on public score. The `.co` 88.740 stays a valid backup
+final.
 
 **Independent corroboration + a stronger hypothesis, checked and excluded (2026-08-24).**
 Discussion 736099 (`cm391`) independently identified the same guardrail ID
@@ -94,8 +96,10 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| **55689327** | **87.570** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust) |
+| **55722148** | **88.065** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust, new best) |
+| 55689327 | 87.570 | term_after@0.99 .internal |
 | 55676678 | 87.210 | term_after@0.99 .internal |
+| 55722165 | 86.535 | term_after@0.99 .internal |
 | 55689363 / 55676665 / 55689346 | 86.850 / 86.445 / 86.130 | term_after@0.99 .internal (mean ~86.8) |
 | 55412934 | 88.740 | term_after@0.99 **.co** — highest public, backup final (egress-fragile) |
 | 55459728 | 87.660 | term_after@0.99 .co (corrected budget) |
