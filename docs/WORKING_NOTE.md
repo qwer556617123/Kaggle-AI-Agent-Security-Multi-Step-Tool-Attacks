@@ -213,8 +213,20 @@ number of reproducible exfiltration events per unit of replay budget.*
 ### 3.3 A stronger claim: the scoring provably collapses to single-predicate throughput
 
 §3.2 shows the other predicates are hard to reach. We can make a sharper, exhaustive statement
-that we believe is the single most useful design insight in this note, because it is a property
-of the *scoring rule itself*, independent of any particular attack wording.
+that is a property of the *scoring rule itself*, independent of any particular attack wording.
+
+**Prior art.** We derived the argument below independently, but it is not unique to this note —
+by the time we are finalizing this write-up, at least a half-dozen competitors have published the
+same collapse-to-a-single-predicate conclusion from their own independent readings of the same
+SDK, most comprehensively canqiang ("The Scored Attack Surface Collapses to a Single Predicate,"
+Kaggle Writeup, DOI 10.34740/kaggle/w/104679), which itself catalogs several earlier independent
+analyses reaching the same result. We credit that convergence rather than claim priority: when a
+result this specific is rediscovered by many people reading the same ~100 lines of guardrail and
+scoring code, that is itself evidence the result is correct, and we treat §3.3 accordingly — as a
+load-bearing premise for §4 onward, not as this note's novel contribution. What we believe *is*
+still differentiated in this note is §4's throughput engineering built on top of the premise
+(§5.1's wrap-up-collapse terminal in particular — see §5.3) and §6's private-transfer measurement
+methodology, neither of which we found published elsewhere as of this writing.
 
 Recall the raw score (Evaluation page; SDK `scoring.py`):
 `raw = Σ_findings Σ_predicates weight(severity) + 2 × |distinct score-cells|`, with the severity
@@ -462,18 +474,43 @@ moot), which is exactly why we carry two Finals betting opposite guardrail stric
 
 ### 5.3 Competitive context
 
-We surveyed the highest-voted public notebooks mid-competition. The strongest fully public,
-reproducible technique family we found (harmony reasoning-collapse + Live-Fill + per-model
-template routing — essentially §4's design) tops out empirically around **~88–89** in other
-participants' hands; our 91.40 (§5.1) already exceeds it via the wrap-up terminal, which we did
-not see published anywhere. The top of the *public* leaderboard sits far higher (≥100, with at
-least one participant reaching >100 in a single submission) — but the host has since stated
-publicly that some high-scoring submissions "rely on implementation-specific behavior of the
-evaluation harness rather than demonstrating a security-relevant failure in the agent or its
-tool use," and that such approaches "may not carry over to the evaluation used for final
-rankings" (competition discussion, 2026-08-06). We take this as strong evidence that the gap
-between ~91 and the top of the public board is not a gap in this report's exploit surface, and
-we do not pursue it further; §7 describes where we directed that effort instead.
+We surveyed the highest-voted public notebooks mid-competition, and again near the end (see
+below). The strongest fully public, reproducible technique family we found (harmony
+reasoning-collapse + Live-Fill + per-model template routing — essentially §4's design) tops out
+empirically around **~88–89** in other participants' hands; our 91.40 (§5.1) already exceeds it
+via the wrap-up terminal, which as of this writing we still have not seen published anywhere,
+including in the most code-level-thorough public working notes on this competition (e.g.
+antoniorotundo2, "A throughput floor plus a genuine multi-step search," which independently reads
+the same harmony/reasoning-suppression mechanism at §5.1's hop-0 level but stops there — it does
+not identify or measure the second, mandatory wrap-up generation §5.1 collapses). The top of the
+*public* leaderboard sits far higher (top entry **138.89** as of 2026-08-26, top 50 clustering
+≥104) — but the host has since stated publicly that some high-scoring submissions "rely on
+implementation-specific behavior of the evaluation harness rather than demonstrating a
+security-relevant failure in the agent or its tool use," and that such approaches "may not carry
+over to the evaluation used for final rankings" (competition discussion, 2026-08-06). A
+late-competition independent read of the same threads (competition discussion 712642, forum user
+Ya Xu) adds a second, sharper reason to discount the visible top-of-board number specifically:
+after the 2026-08-05 runtime-enforcement change (§7), old pre-update scores were never rescored,
+so part of what the public board still displays as its historical high-water mark was set under a
+throughput regime roughly 3× more permissive than the one any submission is scored against today
+— a claim a subsequent forum thread sharpens further by reporting that some pre-update
+high-scoring exfiltration submissions score **0** when resubmitted under the corrected scorer.
+We take both points as strong, independently-sourced evidence that the gap between our ~91
+(pre-update) / ~83–88 (post-update, §5.2) band and the top of the public board is not a gap in
+this report's exploit surface, and we do not pursue it further; §7 describes where we directed
+that effort instead.
+
+We also checked, near the end of the competition, whether any public writeup had found a
+throughput lever we missed by scaling candidate *count* rather than per-candidate latency —
+i.e., re-litigating §4.4's amortization result with fresh eyes. We found none: Tom Yim's
+independent defense-bound writeup ("Which guardrail hardening stops the exfiltration primitive —
+at what cost," DOI 10.34740/kaggle/w/108643) reports the same negative result as our own §4.4,
+from an independent implementation — dense multi-message stacking, higher messages-per-candidate,
+and single-message multi-post bursts each scored *below* their own single-post baseline
+(25 / 45 / 15 vs ~52), which they attribute to the same mechanism we measured directly in §4.4:
+the target models self-limit to roughly one consequential tool call per turn regardless of how
+the prompt asks for more. Independent negative results from a different implementation are
+better evidence for §4.4's conclusion than our own measurement alone.
 
 ### 5.4 Reasoning-collapse injection (the primary latency lever)
 
@@ -649,7 +686,21 @@ the SDK — only the name is). The name is informative: it indicates a **provena
 defense, not a content/pattern scanner. This matters because when a competitor asked the host
 directly whether the private guardrail was "primarily content-based / primarily
 provenance-based / both / can't say," the host declined to specify — so the classification is
-*inferable from the public gateway code but not otherwise disclosed*.
+*inferable from the public gateway code but not otherwise disclosed*. We should note this
+inference is no longer ours alone: at least two other competitors independently read the same
+loader dict and posted the identical class name publicly on the competition discussion board
+(user cm391; user hengck23, in a thread that reached 16 upvotes and 19 comments), which we take
+as corroboration of the reading rather than a loss of any edge — three independent extractions of
+the same identifier from the same public source is stronger evidence than one. We also weighed a
+competing, more pessimistic hypothesis from the same discussion period: Tom Yim's independent
+defense-bound writeup (§5.3) infers from the *aggregate* public/private score gap across the
+field that the private guardrail "does some content inspection." We consider that weaker evidence
+than the code-level class name — an aggregate score gap is consistent with many explanations
+(content inspection, provenance, a stricter reachability bound on the same four predicates, or
+simply lower throughput under a slower private-replay pool) and cannot itself distinguish between
+them — but we record the disagreement rather than pretend the community has converged on one
+reading. It is precisely this genuine uncertainty that justifies keeping two Final Submissions
+that bet on different guardrail behavior (§5.2a) instead of committing to either reading alone.
 
 A provenance guardrail decides by asking *where the data in a dangerous action came from*, and
 the benchmark fixes that vocabulary at the source level: the tool suite marks web reads as

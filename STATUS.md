@@ -122,7 +122,51 @@ use only the guardrail's name, which is in the public gateway source.*
 | 55625574 | 32.755 | attack_priv++ resample (08-19, slow-pool day) |
 
 **Action before Sept 1:** keep resampling both configs on idle daily quota; at selection time pick
-the argmax-public ref of each (currently 55412934 + 55321811) and lock them in the Kaggle UI.
+the argmax-public ref of each (currently **55722165** [.internal, preferred over the .co backup
+55412934] + 55321811) and lock them in the Kaggle UI.
+
+## Community corroboration sweep (2026-08-26) — no new lever, external validation found
+
+Read the competition discussion board (new threads since our 2026-08-24 pass) and several
+competitor Working Note writeups (`canqiang`/Xander, Tom Yim, hotton, Antonio Rotundo, Cleanor
+Labs) end-to-end. Net result: **no new score-moving technique**, but three findings worth
+recording.
+
+1. **Our impossibility proof (§3.3) and multi-post/multi-message death (§4.4) are now
+   independently corroborated by multiple other competitors' own code-level readings and live
+   tests**, not just our own — e.g. Tom Yim's independent multi-post throughput test scored
+   25/45/15 vs. a ~52 single-post baseline, the same negative result as our §4.4. This is
+   reassuring (nobody has found a lever we missed) but means the impossibility-proof framing is
+   no longer differentiated for the Working Note Award — reframed accordingly (`WORKING_NOTE.md`
+   §3.3, §5.3).
+2. **The `persistent_provenance_private` guardrail-ID reading is now public, independently found
+   by at least 2 other competitors** (`cm391`, and `hengck23` in a 16-upvote/19-comment thread) —
+   no longer an information edge, though the corroboration strengthens confidence in the reading.
+   A competing hypothesis (Tom Yim: aggregate public/private gap "consistent with...content
+   inspection") is weaker evidence (aggregate-gap folklore vs. a code-level class name) but is
+   recorded as a live disagreement — exactly why we keep two Finals betting on different
+   guardrail behavior instead of committing to one reading (`WORKING_NOTE.md` §6.4).
+3. **Nobody else has published the hop-1 wrap-up-collapse terminal** (§5.1, our +3.69–5.0 point
+   lever) — checked again against the most code-thorough recent public note we could find
+   (Antonio Rotundo's, which independently reads the same harmony/reasoning-suppression mechanism
+   at the hop-0 level but stops there). This remains our clearest differentiated contribution;
+   emphasized more prominently in the Working Note.
+
+Also recalibrated: public leaderboard top entry is now **138.89** (was ~123 on 2026-08-08), top
+50 cluster ≥104 — consistent with continued GPU-lottery grinding (top teams show 30–180+ entries)
+inflating the visible ceiling further, not a new technique. A forum thread (Ya Xu / Pilkwang Kim,
+discussion 712642) reports some of that historical top-of-board number was set under the
+pre-2026-08-05 evaluator and would score partially or fully **0** if resubmitted today — further
+reason not to chase it (already our position; see `WORKING_NOTE.md` §5.3).
+
+One tooling note, not acted on: a competitor (`cm391`) published a technique to run the actual
+`JEDAttackInferenceServer` locally via `run_local_gateway()` on a free Kaggle CPU kernel (no GPU
+quota spent), with `jed_attack_gateway.DEFAULT_BUDGET_S` patchable for fast iteration. This only
+exercises the *public* guardrail path (same one already used for scoring), so it's a legitimate,
+zero-cost way to validate margin/fill-rate assumptions against the real harness instead of our
+approximate `local_eval_*.py` stubs. Not pursued this session because our margin/fill-rate work is
+already validated by repeated live submissions and the technical space is proven exhausted — noted
+here as a cheap option if we want one more confidence check on Final-1's config before Sept 1.
 
 **Public score progression (pre-rewrite):** 4.41 → 34.68 → 44.5 → 55 → 61.97 → 64.44 → 86.40 →
 90.09 → **91.40**. Post-rewrite draws of the same throughput config span a wide **~65–89**
