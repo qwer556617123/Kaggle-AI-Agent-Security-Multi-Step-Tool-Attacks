@@ -59,7 +59,7 @@ PASS. **Confirmed zero-cost:** internal-domain draws scored **86.445 / 87.210** 
 (both pass, untainted), egress (both internal), content/token (attack_priv injection-free — the
 one axis attack_term can't cover without losing throughput).
 
-**Preferred Final-1 is now the internal-domain draw `55722148` (88.065), not the `.co` 88.740
+**Preferred Final-1 is now the internal-domain draw `55722165` (88.065), not the `.co` 88.740
 (55412934).** Reason: `.internal` dominates on *expectation* — under pure provenance both pass and
 88.740 is marginally higher, but under provenance+egress `.co`→0 while `.internal`→~87-88; the
 crossover is at only ~2% egress-filter probability, well below any reasonable estimate. The
@@ -96,10 +96,10 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| **55722148** | **88.065** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust, new best) |
+| **55722165** | **88.065** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust, new best) |
 | 55689327 | 87.570 | term_after@0.99 .internal |
 | 55676678 | 87.210 | term_after@0.99 .internal |
-| 55722165 | 86.535 | term_after@0.99 .internal |
+| 55722148 | 86.535 | term_after@0.99 .internal |
 | 55689363 / 55676665 / 55689346 | 86.850 / 86.445 / 86.130 | term_after@0.99 .internal (mean ~86.8) |
 | 55412934 | 88.740 | term_after@0.99 **.co** — highest public, backup final (egress-fragile) |
 | 55459728 | 87.660 | term_after@0.99 .co (corrected budget) |
