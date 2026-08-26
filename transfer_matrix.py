@@ -71,13 +71,20 @@ def main() -> None:
             results[(label, gname)] = allowed
         print("%-36s" % label + "".join("%-13s" % ("%d/%d" % (c, N)) for c in cells))
     print("-" * 118)
-    ze = ", ".join(sorted(pg.ZEROES_EVERYONE))
-    print("ZEROES-EVERYONE (no marker-exfil attack can EVER score -> gives no ranking signal ->")
-    print("a ranked competition cannot use it -> NOT a plausible private guardrail): %s" % ze)
-    print("So the RANKABLE hypotheses are the rest. attack_priv must cover THOSE.")
+    ze = ", ".join(sorted(pg.ZEROES_EVERY_MARKER_EXFIL))
+    print("ZEROES EVERY MARKER-EXFIL attack (corrected 2026-08-26: NOT 'zeroes everyone' --")
+    print("CONFUSED_DEPUTY survives these, see attack_deputy.py + transfer_matrix_deputy.py):")
+    print("  %s" % ze)
+    print("This table only scores our EXFIL-based attacks, so these two columns will read 0/%d"
+          % N)
+    print("for every row below regardless -- that is now an EXFIL-specific dead end, not proof")
+    print("the guardrail itself is implausible. attack_priv covers the EXFIL-rankable rest;")
+    print("attack_deputy (separate script) is what covers these two as well.")
 
-    # Verdict per attack: which RANKABLE hypotheses each survives.
-    rankable = [g for g in gnames if g not in pg.ZEROES_EVERYONE]
+    # Verdict per attack: which of the EXFIL-rankable hypotheses each survives. (The two
+    # marker-exfil dead ends above are excluded here only because every row in this table is
+    # an EXFIL attack and would trivially read 0 on both -- not because they are implausible.)
+    rankable = [g for g in gnames if g not in pg.ZEROES_EVERY_MARKER_EXFIL]
     print("\nSURVIVES among the %d RANKABLE hypotheses (%s):" % (len(rankable),
           ", ".join(r.split("(")[0].replace("G", "") for r in rankable)))
     for label, modname, tname in SUBJECTS:
