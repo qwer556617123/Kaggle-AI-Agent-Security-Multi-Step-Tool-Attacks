@@ -153,6 +153,7 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
+| 55801498 | PENDING (08-26) | term_after@0.99 .internal resample, chasing >88.065 |
 | **55722165** | **88.065** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust, new best) |
 | 55689327 | 87.570 | term_after@0.99 .internal |
 | 55676678 | 87.210 | term_after@0.99 .internal |
@@ -172,6 +173,7 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
+| 55801572 | PENDING (08-26) | attack_priv++ resample, chasing >46.470 |
 | **55321811** | **46.470** | attack_priv++ (6/6 coverage) ← current best Final-2 |
 | 55551225 | 46.255 | attack_priv++ (tightened margin) |
 | 55354552 | 45.620 | attack_priv (plain, 5/6 — do NOT pick over ++) |
