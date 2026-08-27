@@ -13,13 +13,12 @@ comparable across the 2026-08-05 harness rewrite (see below).
 |------|--------|------|------|------|------|
 | **Final-1 (throughput)** | single-post + reasoning-collapse + wrap-up terminal, fill 0.99 | `attack_term.py` | 91.40 (ref 55132583) | 82.8–88.1 across clean draws post-rewrite (see below) | v36 / 55132583 |
 | **Final-2 (private hedge)** | injection-free + internal domain + unique payload + sentinel-reconstruction | `attack_priv.py` | — (public score is deliberately traded away) | 45.6–46.5 | v75 / 55551225 |
-| **Final-2 candidate (universal-survivor hedge)** | pure CONFUSED_DEPUTY, no exfil at all | `attack_deputy.py` | — | PENDING (submitted 2026-08-26) | v89 / 55801487 |
+| Considered, not selected | pure CONFUSED_DEPUTY, no exfil at all | `attack_deputy.py` | — | 16.125 | v89 / 55801487 |
 
 Both finals are **best-of protected**: nothing described below can lower either number. The
 official Final Submission selection (up to 2, for private-leaderboard judging) has not been
-locked yet — do that before 2026-09-01. **`attack_deputy` is a new candidate under evaluation
-for Final-2 (see below) — do not treat it as decided until its live number is in and compared
-against `attack_priv++`.**
+locked yet — do that before 2026-09-01. **`attack_deputy` was evaluated as a possible Final-2
+swap and rejected on EV grounds (see below) — `attack_priv++` remains Final-2.**
 
 ## attack_deputy — a universal-survivor hedge (2026-08-26), credit: hexisteme discussion 737535
 
@@ -64,16 +63,42 @@ latency win on an already-low-value predicate (severity 3, raw 6/candidate vs EX
 that reportedly already fires near-100% unprompted is the wrong trade. Mode-A local validation:
 PASS (39/39 findings, all CONFUSED_DEPUTY, no accidental EXFILTRATION).
 
-**Submitted 2026-08-26: kernel v89, ref `55801487`, PENDING.** Judgment on whether it should
-*replace* `attack_priv++` as Final-2 (rather than sit as a third, unused candidate) is deferred
-until this live number is in — comparison isn't just 27.665 vs. attack_priv++'s ~46: those two
-numbers are payoffs under *different* guardrail-world assumptions (deputy's ~6-28 ceiling is
-what it's worth if G1/G3-style content-inspection is real and kills all exfil; attack_priv++'s
-~46 is what it's worth across the *other* rankable hypotheses where exfil survives in some form).
-Since Final Submission selection takes the best of the two chosen finals, the right comparison
-is against Final-1 (`attack_term`) under each hypothesis, not against `attack_priv++` directly —
-this needs a clear-headed writeup, not a snap swap. See `docs/WORKING_NOTE.md` (to be updated)
-for the full argument once the live number lands.
+**Result (2026-08-26): kernel v89, ref `55801487` = public 16.125** (raw≈3225 → ≈538 firing
+candidates — lower than `hexisteme`'s reported 27.665/~922, plausibly because we deliberately
+paid for full 8/8 coverage instead of the harmony-injection throughput lever that would break
+`G2`; not investigated further, since this attack's job is a worst-case floor, not maximizing
+public score).
+
+**Decision: keep `attack_priv++` as Final-2; do not swap in `attack_deputy`.** Worked the EV
+comparison per hypothesis (a *hybrid* single submission that blends both mechanisms was also
+considered and rejected — see note below):
+
+| Guardrail world | `attack_term` (Final-1) | `attack_priv++` | `attack_deputy` | Final-2 pick that wins |
+|---|---|---|---|---|
+| permissive / provenance (G0, G6, …) | ~85 (wins outright) | ~46 (irrelevant, Final-1 already wins) | ~16 (irrelevant) | doesn't matter |
+| `G2` harmony-token filter | **0** | **~46** | ~16 | `attack_priv++` (+30 margin) |
+| `G7` DLP/canary marker-scan | **0** | **~46** | ~16 | `attack_priv++` (+30 margin) |
+| `G1`/`G3` payload/intent inspection (kills ALL exfil) | **0** | **0** | **~16** | `attack_deputy` (+16 margin) |
+
+`attack_priv++` wins by a *larger* margin (+30) in the worlds where it wins than `attack_deputy`
+does in its one winning world (+16), and there is no evidence `G1`/`G3`-style payload inspection
+is more likely than `G2`/`G7`-style input/output filtering — both are equally "obvious"
+hardenings of the public baseline. Swapping would trade a bigger, more broadly-applicable margin
+for a smaller, narrower one without a probability argument to justify it.
+
+**A hybrid single submission (exfil + a deputy tail in one Final-2, splitting the replay budget)
+was considered and rejected on the math, not just judgment.** Because each proxy guardrail's
+`decide()` is a deterministic ALLOW/DENY gate (not partial), in *every* single hypothesis only
+*one* of the two mechanisms ever scores nonzero — so splitting one fixed replay-time budget
+between them strictly *dilutes* whichever one would have fired at full strength, with no world
+in which the split helps. (E.g. a 70/30 split scores ~32+~5=37 in a `G2`-only world, worse than
+a pure `attack_priv++`'s 46 there, for a `G1`/`G3` floor of only ~5, worse than a pure
+`attack_deputy`'s 16.) The correct hedge unit is a whole Final Submission slot, not a
+fraction of one — which is exactly what the "best of 2 finals" mechanism is for.
+
+`attack_deputy` stays in the repo as a validated, documented option — reconsider only if new
+evidence shifts the probability read toward `G1`/`G3`-style guardrails specifically (e.g. a
+future host statement, or another independent competitor analysis pointing that way).
 
 ## Finals-selection pool (post-08-05) — the last real prize lever
 
@@ -153,7 +178,7 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| 55801498 | PENDING (08-26) | term_after@0.99 .internal resample, chasing >88.065 |
+| 55801498 | 87.795 | term_after@0.99 .internal resample (08-26) — below argmax, no change |
 | **55722165** | **88.065** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust, new best) |
 | 55689327 | 87.570 | term_after@0.99 .internal |
 | 55676678 | 87.210 | term_after@0.99 .internal |
@@ -173,7 +198,7 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| 55801572 | PENDING (08-26) | attack_priv++ resample, chasing >46.470 |
+| 55801572 | 43.775 | attack_priv++ resample (08-26) — below argmax, no change |
 | **55321811** | **46.470** | attack_priv++ (6/6 coverage) ← current best Final-2 |
 | 55551225 | 46.255 | attack_priv++ (tightened margin) |
 | 55354552 | 45.620 | attack_priv (plain, 5/6 — do NOT pick over ++) |

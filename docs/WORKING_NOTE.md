@@ -779,11 +779,24 @@ and `attack_deputy`'s payoff is much smaller — severity 3 vs. EXFILTRATION's s
 inspects the payload itself, both of our exfiltration-based finals — `attack_term` and
 `attack_priv++` alike, since sentinel-reconstruction still posts the plaintext marker at the end
 — score zero on EXFILTRATION together, and `attack_deputy` is the only submission in our
-portfolio with a nonzero floor in that world. Since Final Submission selection takes the best of
-two chosen finals, whether `attack_deputy` should *replace* `attack_priv++` as Final-2 turns on
-a probability-weighted comparison across guardrail worlds that we had not previously modeled
-correctly, not on either number in isolation — submitted 2026-08-26 (ref pending); the decision
-is deferred to `STATUS.md` once a live number is in.
+portfolio with a nonzero floor in that world.
+
+**Resolution (2026-08-26): keep `attack_priv++` as Final-2.** `attack_deputy` scored public
+16.125 live — lower than `hexisteme`'s 27.665, plausibly the cost of deliberately forgoing the
+harmony-injection throughput lever to keep the full 8/8 coverage. Working the per-world payoff
+table (`STATUS.md` has the full table): `attack_priv++` wins by +30 in the worlds it wins
+(`G2` harmony-filtering, `G7` DLP-style marker-scanning — both plausible, "obvious" hardenings),
+while `attack_deputy` wins by only +16 in its one winning world (`G1`/`G3` payload/intent
+inspection — an equally plausible, but not *more* plausible, hardening). Absent a specific
+reason to weight the latter world higher, the larger, more broadly-applicable margin wins the
+comparison. We also checked, and rejected, a *hybrid* single submission blending both
+mechanisms in one Final-2: because each proxy guardrail's `decide()` is a deterministic
+ALLOW/DENY gate, only one mechanism ever scores nonzero in any single hypothesis, so splitting a
+fixed replay-time budget between them strictly dilutes whichever one would have fired at full
+strength — there is no world in which blending beats picking one specialist outright. The
+correct hedge unit is a whole Final Submission slot; that is what "best of two finals" already
+gives us. `attack_deputy` remains in the repo as a validated, documented option, to reconsider
+only if new evidence specifically favors payload-inspecting guardrails over the alternatives.
 
 ---
 
