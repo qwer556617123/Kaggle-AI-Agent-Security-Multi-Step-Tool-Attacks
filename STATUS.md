@@ -178,6 +178,7 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
+| 55821969 | PENDING (08-27) | term_after@0.99 .internal resample, chasing >88.065 |
 | 55801498 | 87.795 | term_after@0.99 .internal resample (08-26) — below argmax, no change |
 | **55722165** | **88.065** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust, new best) |
 | 55689327 | 87.570 | term_after@0.99 .internal |
