@@ -202,6 +202,7 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
+| 55852540 | PENDING (08-28) | attack_priv++ resample, chasing >46.470 |
 | 55822370 | 46.115 | attack_priv++ resample #2 (08-27) — close, still below argmax |
 | 55822024 | 36.530 | attack_priv++ resample (08-27) — below argmax, no change (slow-pool draw) |
 | 55801572 | 43.775 | attack_priv++ resample (08-26) — below argmax, no change |
