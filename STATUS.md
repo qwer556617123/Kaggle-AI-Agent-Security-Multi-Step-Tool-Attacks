@@ -178,9 +178,9 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| 55822403 | PENDING (08-27) | term_after@0.99 .internal resample #3, chasing >88.065 |
-| 55822052 | PENDING (08-27) | term_after@0.99 .internal resample #2, chasing >88.065 |
-| 55821969 | PENDING (08-27) | term_after@0.99 .internal resample, chasing >88.065 |
+| 55822403 | 85.725 | term_after@0.99 .internal resample #3 (08-27) — below argmax, no change |
+| 55822052 | 87.030 | term_after@0.99 .internal resample #2 (08-27) — below argmax, no change |
+| 55821969 | 79.920 | term_after@0.99 .internal resample (08-27) — below argmax, no change (slow-pool draw) |
 | 55801498 | 87.795 | term_after@0.99 .internal resample (08-26) — below argmax, no change |
 | **55722165** | **88.065** | term_after@0.99 **.internal** ← preferred Final-1 (egress+provenance robust, new best) |
 | 55689327 | 87.570 | term_after@0.99 .internal |
@@ -201,8 +201,8 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| 55822370 | PENDING (08-27) | attack_priv++ resample #2, chasing >46.470 |
-| 55822024 | PENDING (08-27) | attack_priv++ resample, chasing >46.470 |
+| 55822370 | 46.115 | attack_priv++ resample #2 (08-27) — close, still below argmax |
+| 55822024 | 36.530 | attack_priv++ resample (08-27) — below argmax, no change (slow-pool draw) |
 | 55801572 | 43.775 | attack_priv++ resample (08-26) — below argmax, no change |
 | **55321811** | **46.470** | attack_priv++ (6/6 coverage) ← current best Final-2 |
 | 55551225 | 46.255 | attack_priv++ (tightened margin) |
