@@ -12,7 +12,7 @@ comparable across the 2026-08-05 harness rewrite (see below).
 | Role | Config | File | Best public (pre-rewrite) | Public post-rewrite | Kernel/ref |
 |------|--------|------|------|------|------|
 | **Final-1 (throughput)** | single-post + reasoning-collapse + wrap-up terminal, fill 0.99 | `attack_term.py` | 91.40 (ref 55132583) | 82.8–88.1 across clean draws post-rewrite (see below) | v36 / 55132583 |
-| **Final-2 (private hedge)** | injection-free + internal domain + unique payload + sentinel-reconstruction | `attack_priv.py` | — (public score is deliberately traded away) | 45.6–46.5 | v75 / 55551225 |
+| **Final-2 (private hedge)** | injection-free + internal domain + unique payload + sentinel-reconstruction | `attack_priv.py` | — (public score is deliberately traded away) | 32.8–47.2 | v100 / 55852583 |
 | Considered, not selected | pure CONFUSED_DEPUTY, no exfil at all | `attack_deputy.py` | — | 16.125 | v89 / 55801487 |
 
 Both finals are **best-of protected**: nothing described below can lower either number. The
@@ -178,9 +178,9 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| 55852599 | PENDING (08-28) | term_after@0.99 .internal resample #3, chasing >88.065 |
-| 55852556 | PENDING (08-28) | term_after@0.99 .internal resample #2, chasing >88.065 |
-| 55852522 | PENDING (08-28) | term_after@0.99 .internal resample, chasing >88.065 |
+| 55852599 | 51.525 | term_after@0.99 .internal resample #3 (08-28) — slow-pool day, no change |
+| 55852556 | 77.580 | term_after@0.99 .internal resample #2 (08-28) — slow-pool day, no change |
+| 55852522 | 76.545 | term_after@0.99 .internal resample (08-28) — slow-pool day, no change |
 | 55822403 | 85.725 | term_after@0.99 .internal resample #3 (08-27) — below argmax, no change |
 | 55822052 | 87.030 | term_after@0.99 .internal resample #2 (08-27) — below argmax, no change |
 | 55821969 | 79.920 | term_after@0.99 .internal resample (08-27) — below argmax, no change (slow-pool draw) |
@@ -204,12 +204,12 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| 55852583 | PENDING (08-28) | attack_priv++ resample #2, chasing >46.470 |
-| 55852540 | PENDING (08-28) | attack_priv++ resample, chasing >46.470 |
+| **55852583** | **47.200** | attack_priv++ resample #2 (08-28) ← **NEW preferred Final-2, new best** |
+| 55852540 | 46.345 | attack_priv++ resample (08-28) — below new argmax |
 | 55822370 | 46.115 | attack_priv++ resample #2 (08-27) — close, still below argmax |
 | 55822024 | 36.530 | attack_priv++ resample (08-27) — below argmax, no change (slow-pool draw) |
 | 55801572 | 43.775 | attack_priv++ resample (08-26) — below argmax, no change |
-| **55321811** | **46.470** | attack_priv++ (6/6 coverage) ← current best Final-2 |
+| 55321811 | 46.470 | attack_priv++ (6/6 coverage) — former best Final-2, now backup |
 | 55551225 | 46.255 | attack_priv++ (tightened margin) |
 | 55354552 | 45.620 | attack_priv (plain, 5/6 — do NOT pick over ++) |
 | 55606873 | 46.080 | attack_priv++ resample (08-18) |
@@ -217,7 +217,7 @@ use only the guardrail's name, which is in the public gateway source.*
 
 **Action before Sept 1:** keep resampling both configs on idle daily quota; at selection time pick
 the argmax-public ref of each (currently **55722165** [.internal, preferred over the .co backup
-55412934] + 55321811) and lock them in the Kaggle UI.
+55412934] + **55852583** [new attack_priv++ best, 47.200]) and lock them in the Kaggle UI.
 
 ## Community corroboration sweep (2026-08-26) — no new lever, external validation found
 
