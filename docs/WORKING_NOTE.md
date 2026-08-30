@@ -798,6 +798,48 @@ correct hedge unit is a whole Final Submission slot; that is what "best of two f
 gives us. `attack_deputy` remains in the repo as a validated, documented option, to reconsider
 only if new evidence specifically favors payload-inspecting guardrails over the alternatives.
 
+### 6.6 A semantic-classifier check, and the throughput fix it motivated
+
+The §6.5 resolution modeled guardrails as deterministic, structural rule-checkers (the shape of
+`optimal.py` itself). We tested a different, complementary hypothesis directly: what if the held-
+out guardrail — or a component of it — has genuine content/intent awareness, whether via an LLM
+judge or a pattern-matcher sophisticated enough to recognize evasion tradecraft rather than only
+literal strings? We used an independent, context-free instance of a general-purpose model as a
+cold-read content-safety classifier (no knowledge of this project, just the raw candidate message
+text and a request to score 1-5 as a defensive filter would) on the actual strings each of our
+three attacks sends. `attack_term` scored 4-5. `attack_deputy` scored 1. **`attack_priv`'s
+`reconstruct_x` template also scored 5 — rated among the most suspicious of all messages tested**,
+because an explicit character-substitution instruction next to a data field is itself a
+recognizable evasion signature, arguably more legible than the plain literal marker it hides. The
+other `attack_priv` framings scored no better despite "mundane operations" cover stories
+(`routine_log`, `healthcheck`) — one was rated the single worst message of the set, because
+"nothing to review here" reads as an attempt to disarm the reviewer, not just as bland phrasing.
+
+This narrows, but does not overturn, §6.5's conclusion: `attack_priv++`'s advantage over
+`attack_deputy` now depends specifically on a guardrail that filters harmony control tokens (`G2`)
+while having no broader evasion-awareness — a real, still-plausible world, just narrower than we'd
+implicitly assumed when treating `G2` and `G7` as two independent, similarly-likely axes. We kept
+`attack_priv++` as Final-2 (documented reasoning: its narrower winning world still pays a larger
+margin than `attack_deputy`'s, and maximizing upside was the explicit stated goal), while recording
+this as a genuine, if inconclusive, finding rather than omitting it because it complicated the
+picture.
+
+The more actionable consequence: `attack_priv++`'s own payoff ceiling (~47 public, at the time)
+was itself suppressed by an unrelated implementation issue, independent of which guardrail
+hypothesis turns out to be true. Its ten-template linguistic-diversity portfolio was built to
+survive a keyword-denylist guardrail (`G3`) that §6.1 had already proven structurally unrankable —
+so the diversity was serving a threat model we had already discarded, at a real throughput cost:
+none of the ten registers differ on any *actual* rankable guardrail axis (`routine_log` and
+`bare_ok` score an identical 5/6 in the proxy matrix), and the fill loop's stopping condition sized
+itself off the *slowest* kept template's latency (a fresh probe measured a nearly 2× spread across
+the ten, `bare_ok` at 2.79s vs. `json_terse` at 5.46s, both kept and round-robined together).
+Collapsed the portfolio to `bare_ok` (fastest, still covers `G0/G2/G4/G5/G6`) plus `reconstruct_x`
+on a fixed 15% budget share (preserving `G7` coverage), replacing round-robin with per-template
+sizing. This is a throughput correction, not a new guardrail-survival claim — the coverage table
+in §6.1/6.5 is unchanged; only how fast the surviving templates fill is different. Submitted for a
+live read (STATUS.md tracks the result) to confirm the fix's real-world effect before treating the
+theoretical throughput gain as banked.
+
 ---
 
 ## 7. Verifying against a moving target: the 2026-08-05 harness update
