@@ -12,7 +12,7 @@ comparable across the 2026-08-05 harness rewrite (see below).
 | Role | Config | File | Best public (pre-rewrite) | Public post-rewrite | Kernel/ref |
 |------|--------|------|------|------|------|
 | **Final-1 (throughput)** | single-post + reasoning-collapse + wrap-up terminal, fill 0.99 | `attack_term.py` | 91.40 (ref 55132583) | 82.8–88.1 across clean draws post-rewrite (see below) | v36 / 55132583 |
-| **Final-2 (private hedge)** | injection-free + internal domain + unique payload + sentinel-reconstruction | `attack_priv.py` | — (public score is deliberately traded away) | 32.8–47.2 | v100 / 55852583 |
+| **Final-2 (private hedge)** | injection-free, fast leg (85%) + reconstruct_x G7 leg (15%) — redesigned 08-30, +9pt throughput fix | `attack_priv.py` | — (public score is deliberately traded away) | 55.2–55.9 (redesigned); 32.8–47.2 (old design) | v103 / 55883143 |
 | Considered, not selected | pure CONFUSED_DEPUTY, no exfil at all | `attack_deputy.py` | — | 16.125 | v89 / 55801487 |
 
 Both finals are **best-of protected**: nothing described below can lower either number. The
@@ -153,9 +153,17 @@ round-robin fill with **fixed-share allocation**: `reconstruct_x` fills first, c
 Each leg sizes its own stopping condition off its own measured latency — the `max()` bug is gone
 by construction, not patched. Coverage unchanged (re-ran `transfer_matrix.py`: `bare_ok` still
 5/6, `reconstruct_x` still 6/6 — every rankable hypothesis still covered). Mode-A local validation:
-PASS. **Submitted for a live read: kernel v102, ref `55883100`, PENDING** — this is a genuine
-throughput fix, not a parameter tweak, so the live number is the real test of whether the theory
-holds; update this section once it lands.
+PASS.
+
+**Result: confirmed, real, and tight.** Three independent draws (v102/103/105, refs `55883100`/
+`55883143`/`55883192`) scored **55.205 / 55.925 / 55.790** — a ~+9-point jump over the old
+design's best (47.200) and roughly +17-19% relative, landing consistently in a **0.7-point band**
+(55.2-55.9) versus the old design's ~14.4-point spread (32.8-47.2) across its own resamples. The
+fix didn't just raise the mean, it visibly tightened the variance too — consistent with the
+theory: the old max()-over-kept-templates sizing meant a single slow outlier (`json_terse`,
+measured 5.463s) could dominate how conservatively the whole portfolio sized itself, adding
+run-to-run noise on top of ordinary GPU-pool variance. **New preferred Final-2: `55883143`
+(55.925).** This is a genuine, verified throughput win, not a parameter tweak — banked.
 
 ## Finals-selection pool (post-08-05) — the last real prize lever
 
@@ -235,8 +243,8 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| 55883210 | PENDING (08-30) | term_after@0.99 .internal resample #2, chasing >88.065 |
-| 55883166 | PENDING (08-30) | term_after@0.99 .internal resample, chasing >88.065 |
+| 55883210 | 87.435 | term_after@0.99 .internal resample #2 (08-30) — below argmax, no change |
+| 55883166 | 86.580 | term_after@0.99 .internal resample (08-30) — below argmax, no change |
 | 55852599 | 51.525 | term_after@0.99 .internal resample #3 (08-28) — slow-pool day, no change |
 | 55852556 | 77.580 | term_after@0.99 .internal resample #2 (08-28) — slow-pool day, no change |
 | 55852522 | 76.545 | term_after@0.99 .internal resample (08-28) — slow-pool day, no change |
@@ -263,9 +271,9 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
-| 55883192 | PENDING (08-30) | attack_priv **REDESIGNED** resample #3, chasing >47.2 |
-| 55883143 | PENDING (08-30) | attack_priv **REDESIGNED** resample #2, chasing >47.2 |
-| 55883100 | PENDING (08-30) | attack_priv **REDESIGNED** (bare_ok 85% + reconstruct_x 15%, fixed max()-bug sizing) — see dedicated section below, chasing >47.2 |
+| **55883143** | **55.925** | attack_priv **REDESIGNED** resample #2 (08-30) ← **new preferred Final-2, new best** |
+| 55883192 | 55.790 | attack_priv REDESIGNED resample #3 (08-30) |
+| 55883100 | 55.205 | attack_priv REDESIGNED (bare_ok 85% + reconstruct_x 15%, fixed max()-bug sizing) — see dedicated section above |
 | **55852583** | **47.200** | attack_priv++ (old 10-template design) resample #2 (08-28) ← best of the OLD design |
 | 55852540 | 46.345 | attack_priv++ resample (08-28) — below new argmax |
 | 55822370 | 46.115 | attack_priv++ resample #2 (08-27) — close, still below argmax |
@@ -279,7 +287,8 @@ use only the guardrail's name, which is in the public gateway source.*
 
 **Action before Sept 1:** keep resampling both configs on idle daily quota; at selection time pick
 the argmax-public ref of each (currently **55722165** [.internal, preferred over the .co backup
-55412934] + **55852583** [new attack_priv++ best, 47.200]) and lock them in the Kaggle UI.
+55412934] + **55883143** [attack_priv REDESIGNED, 55.925, replaces the old design's 47.200 best])
+and lock them in the Kaggle UI.
 
 ## Community corroboration sweep (2026-08-26) — no new lever, external validation found
 
