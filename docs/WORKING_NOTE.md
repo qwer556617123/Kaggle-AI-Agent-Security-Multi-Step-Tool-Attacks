@@ -836,9 +836,14 @@ the ten, `bare_ok` at 2.79s vs. `json_terse` at 5.46s, both kept and round-robin
 Collapsed the portfolio to `bare_ok` (fastest, still covers `G0/G2/G4/G5/G6`) plus `reconstruct_x`
 on a fixed 15% budget share (preserving `G7` coverage), replacing round-robin with per-template
 sizing. This is a throughput correction, not a new guardrail-survival claim — the coverage table
-in §6.1/6.5 is unchanged; only how fast the surviving templates fill is different. Submitted for a
-live read (STATUS.md tracks the result) to confirm the fix's real-world effect before treating the
-theoretical throughput gain as banked.
+in §6.1/6.5 is unchanged; only how fast the surviving templates fill is different.
+
+**Confirmed live, not just theoretical.** Three independent post-fix draws scored 55.205 / 55.925
+/ 55.790 — a consistent ~+9-point gain over the old design's best (47.200) and, notably, a
+0.7-point band versus the old ten-template portfolio's 14.4-point spread across its own resamples.
+The fix reduced run-to-run variance as well as raising the mean, consistent with the diagnosis: a
+single slow outlier dominating the old `max()`-sized stopping condition was adding noise on top of
+ordinary GPU-pool variance, not just wasting throughput. Banked as the new Final-2 argmax.
 
 ---
 
