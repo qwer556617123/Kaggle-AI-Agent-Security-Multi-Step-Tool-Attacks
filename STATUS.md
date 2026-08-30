@@ -262,6 +262,7 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
+| 55883192 | PENDING (08-30) | attack_priv **REDESIGNED** resample #3, chasing >47.2 |
 | 55883143 | PENDING (08-30) | attack_priv **REDESIGNED** resample #2, chasing >47.2 |
 | 55883100 | PENDING (08-30) | attack_priv **REDESIGNED** (bare_ok 85% + reconstruct_x 15%, fixed max()-bug sizing) — see dedicated section below, chasing >47.2 |
 | **55852583** | **47.200** | attack_priv++ (old 10-template design) resample #2 (08-28) ← best of the OLD design |
