@@ -235,6 +235,7 @@ use only the guardrail's name, which is in the public gateway source.*
 
 | ref | public | config |
 |-----|--------|--------|
+| 55883166 | PENDING (08-30) | term_after@0.99 .internal resample, chasing >88.065 |
 | 55852599 | 51.525 | term_after@0.99 .internal resample #3 (08-28) — slow-pool day, no change |
 | 55852556 | 77.580 | term_after@0.99 .internal resample #2 (08-28) — slow-pool day, no change |
 | 55852522 | 76.545 | term_after@0.99 .internal resample (08-28) — slow-pool day, no change |
