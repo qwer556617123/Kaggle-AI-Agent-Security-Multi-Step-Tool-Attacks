@@ -2,8 +2,10 @@
 
 **Working Note — AI Agent Security: Multi-Step Tool Attacks (OpenAI · Google · IEEE)**
 
-> **STATUS: LOCAL DRAFT — DO NOT SUBMIT until the Working Note deadline (2026-09-08).**
-> Living document; updated as experiments land. Numbers marked *(pending)* are not yet final.
+> **STATUS: Final Submissions locked in (2026-08-31); this note is feature-complete and in final
+> proofread ahead of the Working Note deadline (2026-09-08).** Living document; updated as
+> experiments landed throughout the competition — the numbers throughout are the actual measured
+> results, not placeholders.
 
 ---
 
@@ -1088,6 +1090,10 @@ packaged SDK/gateway source and reproduced by the local harness.
 
 ---
 
-*This is a living local draft, updated through the mid-competition harness rewrite (§7) and the
-sentinel-reconstruction private-transfer result (§6.2). Final numbers and any late findings will
-be folded in before the 2026-09-01 submission deadline.*
+*This note was updated through the mid-competition harness rewrite (§7), the sentinel-
+reconstruction private-transfer result (§6.2), the semantic-classifier check and throughput fix
+(§6.6), and the Final Submission selection: `attack_term.py` (`.internal` egress, wrap-up-collapse
+terminal) and `attack_priv.py` (redesigned two-leg version, §6.6) were locked in as Final-1 and
+Final-2 on 2026-08-31, ahead of the 2026-09-01 Final Submission deadline. Any late findings before
+the 2026-09-08 Working Note deadline will be folded in above their relevant section rather than
+appended here.*
