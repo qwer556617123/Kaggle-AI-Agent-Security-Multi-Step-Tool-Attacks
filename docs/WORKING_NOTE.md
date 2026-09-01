@@ -9,6 +9,34 @@
 
 ---
 
+## TL;DR — a reading guide
+
+This note is long because it documents a lot of *checked* work, including negative results we
+consider first-class output, not filler. If you have five minutes, here is the shape of it:
+
+- **The headline number:** public score **91.40** (pre-harness-update), from two measured latency
+  levers stacked on a proven-optimal single-predicate strategy — §3.3, §5.1, §5.4.
+- **The two contributions we believe are actually differentiated** (most of the rest is
+  independently confirmed by other competitors too, credited throughout rather than claimed as
+  ours — see §3.3's "Prior art" note): the **wrap-up-collapse terminal** (§5.1, a second,
+  previously-uncounted generation per candidate that we found and collapsed for a further
+  measured +3.69–5.0 points) and the **private-transfer proxy-guardrail matrix** (§6, a *measured*
+  rather than *guessed* answer to "does this survive a guardrail we cannot see," extended to a
+  semantic-classifier check in §6.6 that we did not have to run and did not like the answer to).
+- **Everything else — the harness reverse-engineering (§2, §7), the reachability proofs (§3), the
+  amortization dead-ends (§4.4), the GPU-lottery variance analysis (§5.2), and the final-selection
+  decision theory (§5.2a, §6.5–6.6) — is the supporting evidence and methodology** for how we got
+  and verified the two results above, kept in because the judging criteria explicitly reward
+  reproducibility and a disciplined negative-result record, not because we expect every reader to
+  need all of it. Skip straight to §3.3, §5.1, and §6 if you only read three sections.
+- **What we tried and killed, in one line each:** multi-message chains (replay-budget accounting
+  killed it, §4.4/§5), multi-hop single-message bursts (later reasoning resumes and it gets
+  slower, §4.4), an offline-fastest wording that regressed live (§5.4–5.5), two source-verified
+  harness-update fixes that changed nothing measurable (§7.2, §7.4), and a universal-survivor
+  CONFUSED_DEPUTY hedge we built, verified, and then did not select (§6.5).
+
+---
+
 ## Scope and responsible disclosure
 
 This note concerns **only** the competition's deterministic, offline, fixture-backed sandbox
