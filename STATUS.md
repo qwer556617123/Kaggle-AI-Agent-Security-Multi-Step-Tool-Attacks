@@ -455,8 +455,20 @@ private-transfer measurement (§ above) instead of chasing it. See Working Note 
   (notebook builders that base64-embed a source attack variant) + `push_submit.py` (push a
   kernel version, poll for COMPLETE, submit — only `competition_submit_code` consumes a daily
   slot, pushing is free).
-- `docs/WORKING_NOTE.md` — the $2,500 write-up (local until the 2026-09-01 deadline; do not
-  upload before then).
+- `docs/WORKING_NOTE.md` — the $2,500 write-up, feature-complete and proofread, ready to publish
+  before the 2026-09-08 Working Note deadline. **Submission mechanism** (confirmed 2026-09-02):
+  Kaggle's built-in Project Writeup feature — log in, "Your Work" (left sidebar) → "Create" →
+  "New Project Writeup" (the black button, not the blue "+" one), paste in the content, and
+  **set it to Public** (host María Cruz's own posted instructions, verified against an identical
+  Working Note Award in another of her competitions — this competition never posted an
+  equivalent announcement, per an unanswered community question, but the mechanism itself is a
+  general Kaggle feature, confirmed by every other Working Note in this competition being
+  published exactly this way: `kaggle.com/writeups/<user>/<slug>`). This competition has no
+  posted "share the link here by [date]" instruction the way some others do; the convention every
+  other Working Note author in this competition actually followed is to ALSO post a companion
+  Discussion Topic titled `[Working Note] <title>` linking to the writeup (see discussion 737100,
+  737535, etc. for examples) — do that too. This final publish step needs the user's own Kaggle
+  login; it is not something to do without their explicit go-ahead each time.
 - `docs/archive/` — early-competition strategy/resume notes (pre-2026-07-20), superseded by
   this file and the Working Note; kept for history, not maintained.
 
