@@ -1,8 +1,9 @@
-"""Build the attack_priv++ (sentinel-reconstruction) submission notebook: embeds the current
-attack_priv.py (base64), cloning the submission_priv notebook structure/kernel id.
+"""Build the attack_priv submission notebook: embeds the current attack_priv.py (base64) into
+the shared notebook template (tools/notebook_template.ipynb + kernel-metadata.template.json).
 
 Usage:  python tools/build_priv_nb.py
-Outputs submission_priv_plusplus/ next to the other submission dirs.
+Outputs submission_priv_plusplus/ (regenerated fresh each run; not kept in git -- see
+STATUS.md's file-map note on the 2026-09-02 cleanup).
 """
 from __future__ import annotations
 
@@ -12,8 +13,8 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TEMPLATE_NB = ROOT / "submission_priv" / "attack-submission.ipynb"
-TEMPLATE_META = ROOT / "submission_priv" / "kernel-metadata.json"
+TEMPLATE_NB = ROOT / "tools" / "notebook_template.ipynb"
+TEMPLATE_META = ROOT / "tools" / "kernel-metadata.template.json"
 ATTACK_SRC = ROOT / "attack_priv.py"
 
 

@@ -433,22 +433,42 @@ private-transfer measurement (§ above) instead of chasing it. See Working Note 
 
 ## File map
 
-- **`attack_term.py`** — Final-1 (throughput, wrap-up terminal). **`attack_priv.py`** — Final-2
-  (private-transfer, sentinel-reconstruction). **`attack_deputy.py`** — Final-2 *candidate*
-  (2026-08-26, universal-survivor CONFUSED_DEPUTY hedge, pending live number, not yet decided).
-  `attack_d.py` — pre-wrap-up-terminal 86.40 baseline. `attack_ling.py` — retired Final-2
-  predecessor (dominated by `attack_priv`).
-- `attack_b/c` — multi-message (dead, kept as evidence). `attack_e/f` — wrap-up/reliability
-  variants. `attack_g/h` — early private diversity hedges (superseded by `attack_priv`; `g`'s
-  blind-emitted CONFUSED_DEPUTY tail is superseded by the Live-Fill-validated `attack_deputy`).
-  `attack_i` — reasoning-effort (abandoned). `attack_j` — inj_terminal (voided).
-  `attack_term_multi.py` — forged multi-post, live-tested and killed (82.87 vs 91.40).
-  All kept for history / as Working Note evidence, not active (except `attack_deputy`, pending).
-- `local_eval_*.py` — offline Mode-A validators (real guardrail + stub agent) per attack variant.
+- **`attack_term.py`** — **Final-1** (throughput, wrap-up terminal, `.internal` egress). Locked
+  in as ref `55722165`.
+- **`attack_priv.py`** — **Final-2** (private-transfer, redesigned two-leg version — `bare_ok`
+  fast leg + a fixed 15%-budget `reconstruct_x` leg for G7 coverage, §6.6). Locked in as ref
+  `55883143`.
+- `attack_deputy.py` — the universal-survivor CONFUSED_DEPUTY hedge (8/8 proxy-guardrail
+  coverage). Evaluated as a possible Final-2 swap (2026-08-26) and **not selected** on EV
+  grounds (§6.5–6.6); kept as a validated, documented alternative, not active.
+- `attack_d.py` — the pre-wrap-up-terminal 86.40 baseline; still a live code dependency of
+  `attack_term.py`/`attack_ling.py`/`transfer_matrix.py`/several `local_eval_*.py`, not just
+  historical record. `attack_ling.py` — the retired Final-2 predecessor `attack_priv.py`
+  improved on; still a live dependency of `attack_priv.py`/`transfer_matrix.py`.
+  `attack_term_multi.py` — the forged multi-post technique, live-tested and killed (82.87 vs
+  91.40); still a dependency of `local_eval_term_multi.py`. `attack.py`/`attack_c.py` — the
+  earliest baseline (64.44) and the voided multi-message attempt (v21), kept as the specific
+  numbered evidence the Working Note cites for those results.
+- **Pruned (2026-09-02 cleanup pass, before Working Note submission):** `attack_b.py`,
+  `attack_e.py`, `attack_f.py`, `attack_g.py`, `attack_h.py`, `attack_i.py`, `attack_j.py`, and
+  `local_eval_b.py` — verified (by grep) to have zero remaining code dependents and no
+  finding cited with specific numbers anywhere in `STATUS.md`/`WORKING_NOTE.md`; the earlier,
+  more general lineage they belonged to (multi-message, wrap-up/reliability variants, early
+  private-hedge designs, an abandoned reasoning-effort experiment, a voided terminal wording) is
+  still evidenced by the files kept above. Fully recoverable via `git log --diff-filter=D` if
+  ever needed.
+- `local_eval_*.py` — offline Mode-A validators (real guardrail + stub agent) per active attack
+  variant.
 - `proxy_guardrails.py` + `transfer_matrix.py` — the G0–G7 private-guardrail measurement for the
   EXFIL-based attacks. `transfer_matrix_deputy.py` — the same measurement for `attack_deputy`
   (email.send instead of http.post; needed because it isn't an EXFIL attack).
-- `submission*/` — base64-embedded notebooks (same kernel `qwer556617123/ai-agent-security-attack`).
+- All `submission_*/` build-artifact directories (including the ones that produced the two
+  locked-in Final refs) were pruned in the same 2026-09-02 cleanup. None were a code dependency
+  of anything; each is regenerable in seconds via `tools/build_*.py` from the corresponding
+  `attack_*.py` source (`build_variant_nb.py` for `attack_term.py`, `build_priv_nb.py` for
+  `attack_priv.py`), and the actually-scored kernel versions live permanently on Kaggle's servers
+  (refs recorded throughout this file), so nothing is lost by not keeping the generated notebook
+  on disk.
 - `probes/` — the real-model measurement harness (per-hop latency, sentinel-reconstruction
   fire-rate) on gpt-oss/gemma.
 - `tools/` — `build_variant_nb.py`/`build_lottery_nbs.py`/`build_priv_nb.py`/`build_deputy_nb.py`
@@ -482,11 +502,14 @@ private-transfer measurement (§ above) instead of chasing it. See Working Note 
 - Re-download the competition's evaluation source when diagnosing anything harness-related —
   it changes mid-competition and a stale local copy will mislead: `api.competition_download_files(
   "ai-agent-security-multi-step-tool-attacks", path=..., force=True)`, then diff against `data/`.
-- Submit: `tools/push_submit.py <submission_dir> "<message>"` (wraps
-  `kernels_push` + poll + `competition_submit_code`). Limits: 5 submissions/UTC day, best-of
-  scoring. **Run Kaggle API calls from a directory outside this repo** — a stray OpenSSL DLL
-  somewhere under this tree shadows the conda env's correct one and breaks `import ssl`
-  otherwise.
+- Submit: first (re)generate the notebook — `submission_*/` directories are no longer kept on
+  disk (2026-09-02 cleanup; none were a code dependency), e.g. `python tools/build_variant_nb.py
+  "<terminal text>" <replay_safe> term_internal_099 "<title>"` for `attack_term.py`, or `python
+  tools/build_priv_nb.py` for `attack_priv.py` — then `tools/push_submit.py <submission_dir>
+  "<message>"` (wraps `kernels_push` + poll + `competition_submit_code`). Limits: 5
+  submissions/UTC day, best-of scoring. **Run Kaggle API calls from a directory outside this
+  repo** — a stray OpenSSL DLL somewhere under this tree shadows the conda env's correct one and
+  breaks `import ssl` otherwise.
 - **Known infra gotchas** (not bugs in our code): Kaggle's account-wide concurrent-GPU-session
   cap and weekly GPU-hour quota (free tier: 30h/week, resets weekly, exact reset time not
   documented) can both block a push with a clear error message; just retry later, do not touch

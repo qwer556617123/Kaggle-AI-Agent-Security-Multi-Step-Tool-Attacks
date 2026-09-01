@@ -1047,17 +1047,23 @@ accumulating many trials hoping a pattern will resolve out of noise (§5.2, and 
   portfolio (the wrap-up-collapse terminal, §5.1, for the reasoning model; bare terse wording
   for the non-reasoning model), sized to `REPLAY_SAFE × REPLAY_BUDGET_S` (`REPLAY_BUDGET_S`
   corrected to 8930 s post-harness-update, §7.2).
-- `attack_priv.py` — the private-transfer final: injection-free, ten natural-language
-  registers, unique internal-looking egress domains, unique per-candidate payloads, and the
-  sentinel-reconstruction template (§6.2) for the model on which it fires. `proxy_guardrails.py`
+- `attack_priv.py` — the private-transfer final: injection-free two-leg design (§6.6) — a fast
+  `bare_ok` leg (covers `G0/G2/G4/G5/G6`) and a fixed 15%-budget `reconstruct_x` leg (adds `G7`),
+  unique internal-looking egress domains, and unique per-candidate payloads. `proxy_guardrails.py`
   + `transfer_matrix.py` implement and run the `G0`–`G7` measurement described in §6.
-- `attack.py` (v19, 64.44, plain single-post), `attack_c.py` (v21 multi-message, voided), and
-  `attack_d.py` (v22, 86.40, the pre-wrap-up-terminal baseline) are retained for the record; the
-  full lineage of intermediate attempts (`attack_b.py` through `attack_j.py`, `attack_ling.py`,
-  `attack_term_multi.py`) is preserved in git history rather than deleted, since several of them
-  are the direct evidence for the negative results this report cites (multi-message, multi-hop,
-  a forged-multi-post technique reproduced from a competitor's public notebook and independently
-  falsified live at 82.87 against a 91.40 control).
+- `attack.py` (v19, 64.44, plain single-post), `attack_c.py` (v21 multi-message, voided),
+  `attack_d.py` (v22, 86.40, the pre-wrap-up-terminal baseline), `attack_ling.py` (the retired
+  Final-2 predecessor `attack_priv.py` improved on), and `attack_term_multi.py` (the forged
+  multi-post technique, reproduced from a competitor's public notebook and independently
+  falsified live at 82.87 against a 91.40 control, §4.4) are kept in the repository as direct
+  evidence for the negative results this note cites, and because several are live code
+  dependencies of `transfer_matrix.py`/`local_eval_*.py`, not just historical record. A handful
+  of earlier, purely exploratory variants with no citable finding and no remaining dependency
+  (an early multi-message probe, two wrap-up/reliability variants, two superseded private-hedge
+  designs, an abandoned reasoning-effort experiment, and one voided terminal-wording variant)
+  were pruned from the working tree during a pre-submission cleanup pass; they remain fully
+  recoverable from git history (`git log --diff-filter=D`) for anyone auditing the full lineage,
+  which is what "preserved in git history" means concretely.
 - `local_eval*.py` — Mode-A validation against the **real** `OptimalGuardrail` and scorer using
   a deterministic stub agent; verifies scoring theory, format legality, and self-limiting sizing
   for each attack variant.

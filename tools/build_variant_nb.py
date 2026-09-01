@@ -22,8 +22,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TEMPLATE_NB = ROOT / "submission_term_099" / "attack-submission.ipynb"
-TEMPLATE_META = ROOT / "submission_term_099" / "kernel-metadata.json"
+TEMPLATE_NB = ROOT / "tools" / "notebook_template.ipynb"
+TEMPLATE_META = ROOT / "tools" / "kernel-metadata.template.json"
 ATTACK_SRC = ROOT / "attack_term.py"
 
 
