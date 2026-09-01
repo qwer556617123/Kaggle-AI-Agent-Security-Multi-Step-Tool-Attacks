@@ -15,10 +15,12 @@ comparable across the 2026-08-05 harness rewrite (see below).
 | **Final-2 (private hedge)** | injection-free, fast leg (85%) + reconstruct_x G7 leg (15%) — redesigned 08-30, +9pt throughput fix | `attack_priv.py` | — (public score is deliberately traded away) | 55.2–55.9 (redesigned); 32.8–47.2 (old design) | v103 / 55883143 |
 | Considered, not selected | pure CONFUSED_DEPUTY, no exfil at all | `attack_deputy.py` | — | 16.125 | v89 / 55801487 |
 
-Both finals are **best-of protected**: nothing described below can lower either number. The
-official Final Submission selection (up to 2, for private-leaderboard judging) has not been
-locked yet — do that before 2026-09-01. **`attack_deputy` was evaluated as a possible Final-2
-swap and rejected on EV grounds (see below) — `attack_priv++` remains Final-2.**
+Both finals are **best-of protected**: nothing described below can lower either number.
+**Final Submission selection is LOCKED (2026-08-31, before the 2026-09-01 deadline): Final-1 =
+`attack_term.py` (ref 55722165, 88.065, `.internal` egress) and Final-2 = `attack_priv.py`
+(ref 55883143, 55.925, redesigned two-leg version, §6.6-equivalent below).** `attack_deputy`
+was evaluated as a possible Final-2 swap and rejected on EV grounds (see below) — it stays in
+the repo as a validated, documented option, not selected.
 
 ## attack_deputy — a universal-survivor hedge (2026-08-26), credit: hexisteme discussion 737535
 
@@ -285,10 +287,9 @@ use only the guardrail's name, which is in the public gateway source.*
 | 55606873 | 46.080 | attack_priv++ resample (08-18) |
 | 55625574 | 32.755 | attack_priv++ resample (08-19, slow-pool day) |
 
-**Action before Sept 1:** keep resampling both configs on idle daily quota; at selection time pick
-the argmax-public ref of each (currently **55722165** [.internal, preferred over the .co backup
-55412934] + **55883143** [attack_priv REDESIGNED, 55.925, replaces the old design's 47.200 best])
-and lock them in the Kaggle UI.
+**Locked in the Kaggle UI (2026-08-31): `55722165`** (.internal, preferred over the .co backup
+55412934) **+ `55883143`** (attack_priv REDESIGNED, 55.925, replaces the old design's 47.200
+best). No further resampling needed — this is the final, submitted pair.
 
 ## Community corroboration sweep (2026-08-26) — no new lever, external validation found
 
