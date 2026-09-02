@@ -14,6 +14,13 @@
 This note is long because it documents a lot of *checked* work, including negative results we
 consider first-class output, not filler. If you have five minutes, here is the shape of it:
 
+- **Read the Epilogue first if you read nothing else.** The private leaderboard reveal
+  (2026-09-02) zeroed both of our Final Submissions — not a fluke, but the realization of a risk
+  this note identifies and measures at length (§6.1, §6.5), and that we built a validated defense
+  against (`attack_deputy.py`) but did not select, for reasons the Epilogue reconstructs and
+  corrects honestly, with independent confirmation from a medal-winning competitor who made
+  close to the same allocation error. It is, in our own assessment, the single most useful
+  section in this note for anyone building a similar hedge under genuine guardrail uncertainty.
 - **The headline number:** public score **91.40** (pre-harness-update), from two measured latency
   levers stacked on a proven-optimal single-predicate strategy — §3.3, §5.1, §5.4.
 - **The two contributions we believe are actually differentiated** (most of the rest is
@@ -501,6 +508,10 @@ but positively-correlated observable, and it is the only lever we found that sti
 (f is a property of the unknown private guardrail, and for a config the private guardrail zeroes
 entirely — e.g. a control-token filter against our injection-based throughput config — it is
 moot), which is exactly why we carry two Finals betting opposite guardrail strictness (§6).
+**This caveat, not the correlation itself, is what happened in practice**: the reveal (Epilogue)
+shows `f = 0` for both of our selected configs — order-statistics selection maximized a draw of a
+private score that was fixed at zero regardless of which draw we picked, because the underlying
+mechanism, not the pool-speed draw, was what the private guardrail rejected.
 
 ### 5.3 Competitive context
 
@@ -1120,14 +1131,104 @@ packaged SDK/gateway source and reproduced by the local harness.
   guardrail that inspects every tool argument, or scans broadly for exfiltration intent, would
   stop this entire attack family. We believe — but cannot prove without oracle access — that
   such a guardrail would also be unable to rank any participant, which is why we did not pursue
-  a defense against it further.
+  a defense against it further. **The epilogue below shows this was half right**: a guardrail
+  that inspects the `http.post` payload does stop the entire EXFILTRATION family, but it does
+  not stop `CONFUSED_DEPUTY` (§6.5), so it *does* still rank participants — just not on the
+  predicate nearly everyone, including us, optimized for.
+
+---
+
+## Epilogue: the private leaderboard reveal (2026-09-02)
+
+The competition closed and the (preliminary) private leaderboard was published on 2026-09-02.
+Our result: **both locked-in Final Submissions scored 0.000 private** — `attack_term.py` (ref
+`55722165`, 88.065 public) and `attack_priv.py` (ref `55883143`, 55.925 public) — placing our
+team at rank **#3613 of ~4252**, score 0.000, on the official (preliminary) leaderboard.
+
+This is not a mysterious result, and it is now well-corroborated independently by the wider
+competition community. The top of the *private* board peaked at only 46.425 (discussion 738287,
+"The PUBLIC leaderboard is a mirage, and selection is where this is won" — Adarsh Balanolla),
+against a public top entry above 138: a near-total collapse of the throughput-dominant public
+strategy this note (and every other public analysis we found, §5.3) converged on. Competitors
+who probed the private guardrail directly report it inspects the `http.post` payload itself, not
+only the `url` argument the public `OptimalGuardrail`'s bug exposes (`cm391`, independently the
+first to surface the `persistent_provenance_private` module name we cite in §6.4; `Giovanny
+Rodríguez`, public rank 5, same thread: "For the private set, I think it analyzes everything")
+— exactly the `G1_check_data` hypothesis (§6.1) we modeled, initially excluded as implausible,
+then partially reconsidered (§6.5–6.6), but ultimately still under-weighted relative to the
+alternative.
+
+### What went right, and what went wrong, said plainly
+
+We correctly identified the risk this note documents at length. §6.1 modeled a full-payload-
+inspecting guardrail from early on; §6.5 built and *validated* a genuinely different-mechanism
+hedge (`attack_deputy.py`, CONFUSED_DEPUTY, 8/8 proxy-guardrail coverage — the only design in
+our portfolio that never needs a secret-like string to reach `http.post`'s `data` argument at
+all); §6.6 even surfaced independent evidence narrowing our confidence in the alternative. A
+competitor on the same discussion thread independently recommended exactly the hedging structure
+we used: "you have two selections... use one as a gamble and make the other a safer pick."
+
+Where our execution failed: **our two Final Submissions were not actually diversified.**
+`attack_term.py` and `attack_priv.py` are, underneath different evasions, the *same* underlying
+mechanism — both require the literal `SECRET_MARKER` string to reach `http.post`'s `data`
+argument in the clear, so a guardrail that inspects that argument zeros both simultaneously. The
+one submission in our portfolio immune to that specific failure mode (`attack_deputy.py`) was
+not selected, because our EV calculation (§6.5) weighted the "guardrail filters injection tokens
+only" world higher than the "guardrail inspects payload content" world, absent a way to measure
+which was actually true. That weighting was wrong. In hindsight, the `persistent_provenance_
+private` module name (§6.4) was, if anything, a weak signal in the wrong direction — "provenance"
+evidently was not the whole story, or was combined with a payload check we did not weight heavily
+enough against it.
+
+### Independent confirmation from a medal-winning solution
+
+The clearest confirmation of this exact failure mode comes from Civitasmass's 7th-place solution
+writeup ("7th Place Solution: Transfer Was the Real Attack," Kaggle Writeup, 2026-09-02), read
+after our own reveal. Their strongest public submission (123.730, an `http.post` marker-
+exfiltration route similar in shape to our own `attack_term.py`) also scored **0.000 private** —
+the identical failure mode, at a higher public score than ours. Their selected Final-1, a direct
+one-call `email.send`/CONFUSED_DEPUTY design structurally in the same family as our unselected
+`attack_deputy.py`, scored 34.630 public → 34.510 private — near-perfect transfer. Notably,
+**their second Final slot repeated our exact mistake**: they hedged with a second, higher-
+ceiling `http.post`-family submission ("Mapping", 105.300 public) that also revealed 0.000
+private, and they write plainly that "two direct Email variants would have been the stronger
+pair." A medal-winning, more sophisticated competitor — one who built a private-guardrail timing
+side-channel ("replay tomography": inferring hidden replay duration from the elapsed time
+between the GPT and Gemma generation phases, since a denied action returns fast and an executed
+one does not, letting them infer guardrail behavior *before* the deadline without ever seeing a
+private score) — made essentially the same final-slot allocation error we did. This suggests our
+miscalibration was not a one-off lapse but a structural trap the competition's information design
+set for nearly everyone optimizing the visible signal.
+
+Their own stated lesson generalizes cleanly to ours:
+
+> private score ≈ static ceiling × model emission rate × hidden-guardrail survival × hosted
+> replay completion
+
+Most of this note's own effort (§4–§5) went into the first two factors, which is exactly where
+the public leaderboard gives feedback; §6's proxy-guardrail matrix was our attempt at the third
+factor, and it correctly identified the winning mechanism (§6.5) without correctly weighing it
+against the alternative.
+
+### What we would do differently
+
+Build the diversified hedge *first*, from a mechanism that cannot share a failure mode with the
+throughput final, and treat it as the default second slot rather than a candidate to be
+out-competed by EV arithmetic run on our own uncertain priors. Where a genuinely different
+mechanism exists and is fully validated (as `attack_deputy.py` was), the value of *decorrelating*
+the two Final Submissions' failure modes is easy to underweight against the value of a higher
+expected score under one's own best guess — and our own best guess, like most of the field's, was
+wrong. We report this as the final, and in some ways most useful, negative result in this note:
+the same source-verification discipline that found every other lever in this project (§7's
+methodology) can still be defeated by a probability estimate over a hypothesis space the source
+code does not fully resolve — and the correction for that is architectural (build for
+decorrelation) as much as it is analytical (build a better estimate).
 
 ---
 
 *This note was updated through the mid-competition harness rewrite (§7), the sentinel-
 reconstruction private-transfer result (§6.2), the semantic-classifier check and throughput fix
-(§6.6), and the Final Submission selection: `attack_term.py` (`.internal` egress, wrap-up-collapse
-terminal) and `attack_priv.py` (redesigned two-leg version, §6.6) were locked in as Final-1 and
-Final-2 on 2026-08-31, ahead of the 2026-09-01 Final Submission deadline. Any late findings before
-the 2026-09-08 Working Note deadline will be folded in above their relevant section rather than
-appended here.*
+(§6.6), the Final Submission selection (`attack_term.py` + `attack_priv.py`, locked in
+2026-08-31), and the private-leaderboard reveal and epilogue above (2026-09-02). Any late
+findings before the 2026-09-08 Working Note deadline will be folded in above their relevant
+section rather than appended here.*
