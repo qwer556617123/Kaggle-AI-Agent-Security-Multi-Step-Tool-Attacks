@@ -1,0 +1,240 @@
+<title>Public vs Private Score</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --page:           #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid:           #e1e0d9;
+    --axis:           #c3c2b7;
+    --series-term:    #2a78d6;
+    --series-priv:    #eb6834;
+    --series-deputy:  #1baf7a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --page:           #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid:           #2c2c2a;
+      --axis:           #383835;
+      --series-term:    #3987e5;
+      --series-priv:    #d95926;
+      --series-deputy:  #199e70;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --page:           #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid:           #2c2c2a;
+    --axis:           #383835;
+    --series-term:    #3987e5;
+    --series-priv:    #d95926;
+    --series-deputy:  #199e70;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); }
+  .viz-root {
+    background: var(--surface-1);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--text-primary);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 28px 20px;
+  }
+  h1 { font-size: 20px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.015em; }
+  .sub { font-size: 13.5px; color: var(--text-secondary); margin: 0 0 20px; line-height: 1.55; max-width: 62ch; }
+  svg { width: 100%; height: auto; display: block; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace; }
+  .gridline { stroke: var(--grid); stroke-width: 1; }
+  .axis-line { stroke: var(--axis); stroke-width: 1; }
+  .tick-label { fill: var(--text-muted); font-size: 11px; font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .axis-title { fill: var(--text-secondary); font-size: 12px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
+  .diagonal { stroke: var(--text-muted); stroke-width: 1.3; stroke-dasharray: 3 4; opacity: 0.55; }
+  .diagonal-label { fill: var(--text-muted); font-size: 11px; font-style: italic; }
+  .pt { opacity: 0.5; stroke: var(--surface-1); stroke-width: 0.75; }
+  .pt-term { fill: var(--series-term); }
+  .pt-priv { fill: var(--series-priv); }
+  .pt-deputy { fill: var(--series-deputy); opacity: 1; stroke: var(--surface-1); stroke-width: 2; }
+  .ring { fill: none; stroke-width: 2.25; }
+  .ring-term { stroke: var(--series-term); }
+  .ring-priv { stroke: var(--series-priv); }
+  .callout-line { stroke: var(--text-muted); stroke-width: 1; }
+  .callout-text { fill: var(--text-primary); font-size: 12px; }
+  .callout-text tspan.num { font-weight: 700; font-family: "JetBrains Mono", ui-monospace, monospace; fill: var(--series-deputy); }
+  .legend { font-size: 12.5px; }
+  .legend-label { fill: var(--text-secondary); }
+  .legend-strong { fill: var(--text-primary); font-weight: 600; }
+  .caption { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-top: 6px; }
+  .caption code { font-family: "JetBrains Mono", ui-monospace, monospace; background: var(--grid); padding: 1px 5px; border-radius: 3px; font-size: 11px; }
+</style>
+
+<div class="viz-root">
+  <h1>Public score predicted nothing about private score — except once</h1>
+  <p class="sub">All 55 competition submissions from the harness-rewrite era (2026-08-05 onward), plotted by public score (x) against private score (y). The dashed line marks <em>y&nbsp;=&nbsp;x</em> — perfect public→private transfer.</p>
+
+  <svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+    <!-- gridlines + ticks -->
+    <g>
+      <line class="gridline" x1="70" y1="421.05" x2="830" y2="421.05" />
+      <line class="gridline" x1="70" y1="382.11" x2="830" y2="382.11" />
+      <line class="gridline" x1="70" y1="343.16" x2="830" y2="343.16" />
+      <line class="gridline" x1="70" y1="304.21" x2="830" y2="304.21" />
+      <line class="gridline" x1="70" y1="265.26" x2="830" y2="265.26" />
+      <line class="gridline" x1="70" y1="226.32" x2="830" y2="226.32" />
+      <line class="gridline" x1="70" y1="187.37" x2="830" y2="187.37" />
+      <line class="gridline" x1="70" y1="148.42" x2="830" y2="148.42" />
+      <line class="gridline" x1="70" y1="109.47" x2="830" y2="109.47" />
+
+      <line class="gridline" x1="150" y1="90" x2="150" y2="460" />
+      <line class="gridline" x1="230" y1="90" x2="230" y2="460" />
+      <line class="gridline" x1="310" y1="90" x2="310" y2="460" />
+      <line class="gridline" x1="390" y1="90" x2="390" y2="460" />
+      <line class="gridline" x1="470" y1="90" x2="470" y2="460" />
+      <line class="gridline" x1="550" y1="90" x2="550" y2="460" />
+      <line class="gridline" x1="630" y1="90" x2="630" y2="460" />
+      <line class="gridline" x1="710" y1="90" x2="710" y2="460" />
+      <line class="gridline" x1="790" y1="90" x2="790" y2="460" />
+    </g>
+
+    <!-- axes -->
+    <line class="axis-line" x1="70" y1="460" x2="830" y2="460" />
+    <line class="axis-line" x1="70" y1="90"  x2="70"  y2="460" />
+
+    <!-- y=x reference diagonal -->
+    <line class="diagonal" x1="70" y1="460" x2="790" y2="109.47" />
+    <text class="diagonal-label" x="640" y="182" transform="rotate(-26 640 182)">perfect transfer (private = public)</text>
+
+    <!-- x ticks -->
+    <g class="tick-label" text-anchor="middle">
+      <text x="70"  y="478">0</text>
+      <text x="150" y="478">10</text>
+      <text x="230" y="478">20</text>
+      <text x="310" y="478">30</text>
+      <text x="390" y="478">40</text>
+      <text x="470" y="478">50</text>
+      <text x="550" y="478">60</text>
+      <text x="630" y="478">70</text>
+      <text x="710" y="478">80</text>
+      <text x="790" y="478">90</text>
+    </g>
+    <text class="axis-title" x="450" y="504" text-anchor="middle">Public score</text>
+
+    <!-- y ticks -->
+    <g class="tick-label" text-anchor="end">
+      <text x="60" y="464">0</text>
+      <text x="60" y="425.05">10</text>
+      <text x="60" y="386.11">20</text>
+      <text x="60" y="347.16">30</text>
+      <text x="60" y="308.21">40</text>
+      <text x="60" y="269.26">50</text>
+      <text x="60" y="230.32">60</text>
+      <text x="60" y="191.37">70</text>
+      <text x="60" y="152.42">80</text>
+      <text x="60" y="113.47">90</text>
+    </g>
+    <text class="axis-title" x="24" y="275" text-anchor="middle" transform="rotate(-90 24 275)">Private score</text>
+
+    <!-- data points -->
+    <g>
+<circle class="pt pt-term" cx="769.5" cy="452.2" r="4.5" />
+<circle class="pt pt-term" cx="762.6" cy="451.3" r="4.5" />
+<circle class="pt pt-term" cx="690.6" cy="458.8" r="4.5" />
+<circle class="pt pt-term" cx="682.4" cy="448.3" r="4.5" />
+<circle class="pt pt-term" cx="755.8" cy="459.9" r="4.5" />
+<circle class="pt pt-term" cx="766.2" cy="447.5" r="4.5" />
+<circle class="pt pt-term" cx="709.4" cy="453.2" r="4.5" />
+<circle class="pt pt-term" cx="772.4" cy="447.3" r="4.5" />
+<circle class="pt pt-term" cx="774.5" cy="459.5" r="4.5" />
+<circle class="pt pt-term" cx="762.3" cy="455.6" r="4.5" />
+<circle class="pt pt-term" cx="764.8" cy="455.3" r="4.5" />
+<circle class="pt pt-term" cx="759.0" cy="454.8" r="4.5" />
+<circle class="pt pt-term" cx="770.6" cy="450.8" r="4.5" />
+<circle class="pt pt-term" cx="767.7" cy="447.2" r="4.5" />
+<circle class="pt pt-term" cx="761.6" cy="457.3" r="4.5" />
+<circle class="pt pt-term" cx="649.6" cy="449.1" r="4.5" />
+<circle class="pt pt-term" cx="588.4" cy="453.8" r="4.5" />
+<circle class="pt pt-term" cx="753.6" cy="448.3" r="4.5" />
+<circle class="pt pt-term" cx="776.0" cy="457.7" r="4.5" />
+<circle class="pt pt-term" cx="755.4" cy="453.4" r="4.5" />
+<circle class="pt pt-term" cx="685.2" cy="452.6" r="4.5" />
+<circle class="pt pt-term" cx="761.2" cy="447.5" r="4.5" />
+<circle class="pt pt-term" cx="771.3" cy="450.0" r="4.5" />
+<circle class="pt pt-term" cx="751.1" cy="453.6" r="4.5" />
+<circle class="pt pt-term" cx="766.6" cy="453.7" r="4.5" />
+<circle class="pt pt-term" cx="690.6" cy="458.1" r="4.5" />
+<circle class="pt pt-term" cx="702.5" cy="456.7" r="4.5" />
+<circle class="pt pt-term" cx="763.4" cy="456.7" r="4.5" />
+<circle class="pt pt-term" cx="779.9" cy="452.4" r="4.5" />
+<circle class="pt pt-term" cx="661.8" cy="455.1" r="4.5" />
+<circle class="pt pt-term" cx="770.9" cy="456.4" r="4.5" />
+<circle class="pt pt-term" cx="767.3" cy="448.5" r="4.5" />
+<circle class="pt pt-term" cx="766.6" cy="457.3" r="4.5" />
+<circle class="pt pt-term" cx="746.1" cy="452.2" r="4.5" />
+<circle class="pt pt-term" cx="659.0" cy="451.7" r="4.5" />
+<circle class="pt pt-term" cx="698.9" cy="448.3" r="4.5" />
+<circle class="pt pt-term" cx="655.7" cy="448.0" r="4.5" />
+<circle class="pt pt-term" cx="732.0" cy="448.5" r="4.5" />
+<circle class="pt pt-term" cx="765.9" cy="453.9" r="4.5" />
+<circle class="pt pt-term" cx="775.6" cy="453.6" r="4.5" />
+<circle class="pt pt-priv" cx="516.3" cy="447.5" r="4.5" />
+<circle class="pt pt-priv" cx="517.4" cy="449.4" r="4.5" />
+<circle class="pt pt-priv" cx="511.6" cy="458.5" r="4.5" />
+<circle class="pt pt-priv" cx="482.2" cy="455.9" r="4.5" />
+<circle class="pt pt-priv" cx="447.6" cy="447.3" r="4.5" />
+<circle class="pt pt-priv" cx="440.8" cy="449.6" r="4.5" />
+<circle class="pt pt-priv" cx="438.9" cy="457.8" r="4.5" />
+<circle class="pt pt-priv" cx="362.2" cy="450.3" r="4.5" />
+<circle class="pt pt-priv" cx="420.2" cy="449.0" r="4.5" />
+<circle class="pt pt-priv" cx="332.0" cy="456.5" r="4.5" />
+<circle class="pt pt-priv" cx="438.6" cy="455.7" r="4.5" />
+<circle class="pt pt-priv" cx="440.0" cy="450.5" r="4.5" />
+<circle class="pt pt-priv" cx="435.0" cy="447.9" r="4.5" />
+<circle class="pt pt-priv" cx="441.8" cy="453.0" r="4.5" />
+    </g>
+
+    <!-- selected finals: ring markers -->
+    <g>
+      <circle class="ring ring-term" cx="774.5" cy="460.0" r="9" />
+      <circle class="ring ring-priv" cx="517.4" cy="460.0" r="9" />
+    </g>
+
+    <!-- attack_deputy: the one non-zero point -->
+    <line class="callout-line" x1="199.0" y1="397.2" x2="255" y2="345" />
+    <circle class="pt pt-deputy" cx="199.0" cy="397.2" r="7.5" />
+    <rect x="251" y="322" width="372" height="53" fill="var(--surface-1)" opacity="0.92" />
+    <text class="callout-text" x="259" y="337">
+      <tspan x="259" dy="0">attack_deputy (CONFUSED_DEPUTY)</tspan>
+      <tspan x="259" dy="16">public <tspan class="num">16.125</tspan> = private <tspan class="num">16.125</tspan> — exact transfer</tspan>
+      <tspan x="259" dy="16">the only submission of 55 with any private score at all</tspan>
+    </text>
+
+    <!-- callouts for the two selected finals -->
+    <line class="callout-line" x1="774.5" y1="460" x2="774.5" y2="430" />
+    <text class="callout-text mono" x="700" y="424" text-anchor="end" style="font-size:11.5px">Final-1 selected: 88.065 &#8594; 0.000</text>
+    <line class="callout-line" x1="517.4" y1="460" x2="517.4" y2="405" />
+    <text class="callout-text mono" x="524" y="401" style="font-size:11.5px">Final-2 selected: 55.925 &#8594; 0.000</text>
+
+    <!-- legend: stacked rows, top-left -->
+    <g transform="translate(70,14)">
+      <circle cx="6" cy="0" r="4.5" class="pt-term" style="opacity:0.85" />
+      <text class="legend-label" x="16" y="4">attack_term.py lineage (Final-1 pool, n=40) — every one: private 0.000</text>
+      <circle cx="6" cy="21" r="4.5" class="pt-priv" style="opacity:0.85" />
+      <text class="legend-label" x="16" y="25">attack_priv(++) lineage (Final-2 pool, n=14) — every one: private 0.000</text>
+      <circle cx="6" cy="42" r="4.5" class="pt-deputy" />
+      <text class="legend-label" x="16" y="46">attack_deputy (n=1) — the one submission with any private score</text>
+    </g>
+  </svg>
+
+  <p class="caption">Points at private&nbsp;=&nbsp;0 are given a small vertical jitter purely to reveal overlap density — every jittered point's true private score is exactly 0.000. Ringed markers are the two Final Submissions actually locked in and scored on the official leaderboard. Full per-submission data: <code>docs/WORKING_NOTE.md</code> Epilogue.</p>
+</div>
