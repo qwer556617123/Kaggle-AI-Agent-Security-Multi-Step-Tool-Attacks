@@ -25,14 +25,17 @@ consider first-class output, not filler. If you have five minutes, here is the s
   and end with six lessons learned — the single chart is worth more than the two-data-point
   argument that precedes it.
 - **The headline number:** public score **91.40** (pre-harness-update), from two measured latency
-  levers stacked on a proven-optimal single-predicate strategy — §3.3, §5.1, §5.4.
+  levers stacked on a proven-optimal single-predicate strategy — §3.3, §5.1, §5.4, charted in §5's
+  discovery-timeline figure (the two dead ends we tried and killed are in that chart too, not
+  just the two levers that worked).
 - **The two contributions we believe are actually differentiated** (most of the rest is
   independently confirmed by other competitors too, credited throughout rather than claimed as
   ours — see §3.3's "Prior art" note): the **wrap-up-collapse terminal** (§5.1, a second,
   previously-uncounted generation per candidate that we found and collapsed for a further
   measured +3.69–5.0 points) and the **private-transfer proxy-guardrail matrix** (§6, a *measured*
-  rather than *guessed* answer to "does this survive a guardrail we cannot see," extended to a
-  semantic-classifier check in §6.6 that we did not have to run and did not like the answer to).
+  rather than *guessed* answer to "does this survive a guardrail we cannot see," visualized in full
+  in §6.7, extended to a semantic-classifier check in §6.6 that we did not have to run and did not
+  like the answer to).
 - **Everything else — the harness reverse-engineering (§2, §7), the reachability proofs (§3), the
   amortization dead-ends (§4.4), the GPU-lottery variance analysis (§5.2), and the final-selection
   decision theory (§5.2a, §6.5–6.6) — is the supporting evidence and methodology** for how we got
@@ -390,6 +393,8 @@ firing wording per model, and fill the 9000 s replay budget with it.
 | v22 | single-post + reasoning-collapse injection (`inj_close`) | 86.40 |
 | v23 | added offline-fastest `inj_empty` to the portfolio | 77.58 (**regression**, see §5.5) |
 | **v36** | **v22 + wrap-up-collapse terminal (§5.1)** | **91.40 (best, pre-harness-update)** |
+
+![Public score at each mechanism change from v1 to v36, showing two decisive jumps (reasoning-collapse injection, wrap-up-collapse terminal) and two dead ends (v21 multi-message chain, voided; v23 inj_empty, a measured regression) that were tried and killed rather than shipped.](img/score_journey.png)
 
 Two decisive corrections took us off the 64.44 plateau. First, the replay budget is **9000 s
 per guardrail** (a per-model budget of 18000 s = 9000 public-replay + 9000 private-replay); our
@@ -889,6 +894,24 @@ The fix reduced run-to-run variance as well as raising the mean, consistent with
 single slow outlier dominating the old `max()`-sized stopping condition was adding noise on top of
 ordinary GPU-pool variance, not just wasting throughput. Banked as the new Final-2 argmax.
 
+### 6.7 The coverage matrix, visualized
+
+§6.1–6.6 built this picture one hypothesis at a time, in prose. Here it is as one table, generated
+directly from `transfer_matrix.py`/`transfer_matrix_deputy.py` against the real candidate payloads
+each attack actually submits — not hand-summarized:
+
+![Coverage matrix: eight guardrail hypotheses (G0-G7) across five attack legs. attack_term and attack_priv/attack_priv++ each fail G1 and G3 by construction, since both are EXFILTRATION mechanisms; attack_deputy is the only row that passes all eight, including G1/G3.](img/guardrail_matrix.png)
+
+Reading it by column rather than by row makes §6.5's correction visually unavoidable: **`G1` and
+`G3` are entirely red for every EXFILTRATION-based design, regardless of wording, domain, or
+budget split** — no amount of engineering inside that mechanism family moves those two cells.
+`attack_deputy` is the only row that turns them green, and it does so by being a structurally
+different predicate (`CONFUSED_DEPUTY`), not a better-evaded one. The two Finals we actually
+locked in (`attack_term`, `attack_priv++`) are the two *widest* rows short of `attack_deputy` —
+each covers every rankable hypothesis it structurally can — which is exactly why the Epilogue's
+reveal (a guardrail that turned out to live in the red columns) zeroed both simultaneously rather
+than costing us one of two.
+
 ---
 
 ## 7. Verifying against a moving target: the 2026-08-05 harness update
@@ -1371,7 +1394,8 @@ last. It was, in fact, the only one worth anything.
 *This note was updated through the mid-competition harness rewrite (§7), the sentinel-
 reconstruction private-transfer result (§6.2), the semantic-classifier check and throughput fix
 (§6.6), the Final Submission selection (`attack_term.py` + `attack_priv.py`, locked in
-2026-08-31), the private-leaderboard reveal and epilogue (2026-09-02), and the full 55-submission
-public-vs-private chart and lessons-learned closing above (2026-09-03). Any late findings before
-the 2026-09-08 Working Note deadline will be folded in above their relevant section rather than
-appended here.*
+2026-08-31), the private-leaderboard reveal and epilogue (2026-09-02), and — on 2026-09-03 — three
+figures added throughout (the §5 discovery-timeline chart, the §6.7 guardrail coverage matrix, and
+the Epilogue's full 55-submission public-vs-private chart) alongside the lessons-learned closing.
+Any late findings before the 2026-09-08 Working Note deadline will be folded in above their
+relevant section rather than appended here.*
