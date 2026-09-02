@@ -24,7 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_NB = ROOT / "tools" / "notebook_template.ipynb"
 TEMPLATE_META = ROOT / "tools" / "kernel-metadata.template.json"
-ATTACK_SRC = ROOT / "attack_term.py"
+ATTACK_SRC = ROOT / "src" / "attack_term.py"
 
 
 def build(analysis_text: str, replay_safe: float, tag: str, title: str) -> Path:

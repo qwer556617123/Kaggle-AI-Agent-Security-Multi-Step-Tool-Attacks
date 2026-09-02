@@ -788,6 +788,10 @@ the two Finals and all cited negative-result variants are in the repo.**
 <details>
 <summary>Artifact list</summary>
 
+*All `attack_*.py`, `local_eval_*.py`, `proxy_guardrails.py`, and `transfer_matrix*.py` files
+below live under `src/` in the repository (moved out of the root 2026-09-03 for a cleaner top
+level; each script locates the unpacked competition SDK at `../data` automatically).*
+
 - `attack_term.py` — the throughput final: single-post Live-Fill + per-model injection portfolio (the
   wrap-up-collapse terminal, §5.1, for the reasoning model; bare terse wording for the non-reasoning
   model), sized to `REPLAY_SAFE × REPLAY_BUDGET_S` (`REPLAY_BUDGET_S` corrected to 8930 s post-update,

@@ -15,7 +15,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parent / "data"
+DATA = Path(__file__).resolve().parent.parent / "data"
 sys.path.insert(0, str(DATA))
 
 from aicomp_sdk.agents.types import (  # noqa: E402
@@ -32,7 +32,7 @@ from aicomp_sdk.core.runtime_history import RuntimeHistory  # noqa: E402
 from aicomp_sdk.evaluation.runner import evaluate_redteam  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from attack_d import AttackAlgorithm  # noqa: E402
+from attack_term import AttackAlgorithm  # noqa: E402
 
 _URL_RE = re.compile(r"https?://[\w./-]+")
 _STUB_DELAY_S = 0.02  # make model latency L dominate env-build overhead, as in reality
@@ -105,7 +105,7 @@ def main() -> None:
     atk = result.attack
     assert atk is not None
     print("=" * 60)
-    print("LOCAL MODE-A VALIDATION  attack_d.py (v22 injection portfolio)")
+    print("LOCAL MODE-A VALIDATION  attack_term.py (wrap-up-collapse terminal)")
     print("=" * 60)
     print(f"  normalized score : {atk.score:.2f} / 1000")
     print(f"  raw score        : {atk.score_raw:.1f}")
@@ -121,7 +121,7 @@ def main() -> None:
         raise SystemExit("FAIL: expected a positive normalized score")
     if kinds.get("EXFILTRATION", 0) < 1:
         raise SystemExit("FAIL: no EXFILTRATION fired")
-    print("  RESULT: PASS (single-post injection portfolio scores, replay fits)")
+    print("  RESULT: PASS (attack_term terminal scores, replay fits)")
 
 
 if __name__ == "__main__":

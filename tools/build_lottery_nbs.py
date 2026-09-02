@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 TEMPLATE_NB = ROOT / "tools" / "notebook_template.ipynb"
 TEMPLATE_META = ROOT / "tools" / "kernel-metadata.template.json"
-ATTACK_SRC = ROOT / "attack_term.py"
+ATTACK_SRC = ROOT / "src" / "attack_term.py"
 
 # REPLAY_SAFE ladder: 0.99 reliable-high, 0.995/0.998 progressively void-prone tail tickets.
 FILL_RATES = (0.99, 0.995, 0.998)

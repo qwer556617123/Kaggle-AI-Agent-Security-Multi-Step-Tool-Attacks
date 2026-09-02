@@ -64,7 +64,7 @@ def _add_sdk_root() -> None:
     except Exception:
         pass
     here = Path(__file__).resolve().parent
-    for root in [here / "data", here, Path("/kaggle/input"), Path("/mnt/data")]:
+    for root in [here.parent / "data", here.parent, Path("/kaggle/input"), Path("/mnt/data")]:
         if root.exists() and (root / "aicomp_sdk").exists():
             if str(root) not in sys.path:
                 sys.path.insert(0, str(root))

@@ -21,9 +21,9 @@ rewrite (see below).
 
 | Role | Config | File | Best public (pre-rewrite) | Public post-rewrite | Kernel/ref |
 |------|--------|------|------|------|------|
-| **Final-1 (throughput)** | single-post + reasoning-collapse + wrap-up terminal, fill 0.99 | `attack_term.py` | 91.40 (ref 55132583) | 82.8–88.1 across clean draws post-rewrite (see below) | v36 / 55132583 |
-| **Final-2 (private hedge)** | injection-free, fast leg (85%) + reconstruct_x G7 leg (15%) — redesigned 08-30, +9pt throughput fix | `attack_priv.py` | — (public score is deliberately traded away) | 55.2–55.9 (redesigned); 32.8–47.2 (old design) | v103 / 55883143 |
-| Considered, not selected | pure CONFUSED_DEPUTY, no exfil at all | `attack_deputy.py` | — | 16.125 | v89 / 55801487 |
+| **Final-1 (throughput)** | single-post + reasoning-collapse + wrap-up terminal, fill 0.99 | `src/attack_term.py` | 91.40 (ref 55132583) | 82.8–88.1 across clean draws post-rewrite (see below) | v36 / 55132583 |
+| **Final-2 (private hedge)** | injection-free, fast leg (85%) + reconstruct_x G7 leg (15%) — redesigned 08-30, +9pt throughput fix | `src/attack_priv.py` | — (public score is deliberately traded away) | 55.2–55.9 (redesigned); 32.8–47.2 (old design) | v103 / 55883143 |
+| Considered, not selected | pure CONFUSED_DEPUTY, no exfil at all | `src/attack_deputy.py` | — | 16.125 | v89 / 55801487 |
 
 Both finals are **best-of protected**: nothing described below can lower either number.
 **Final Submission selection is LOCKED (2026-08-31, before the 2026-09-01 deadline): Final-1 =
@@ -443,21 +443,28 @@ private-transfer measurement (§ above) instead of chasing it. See Working Note 
 
 ## File map
 
-- **`attack_term.py`** — **Final-1** (throughput, wrap-up terminal, `.internal` egress). Locked
-  in as ref `55722165`.
-- **`attack_priv.py`** — **Final-2** (private-transfer, redesigned two-leg version — `bare_ok`
-  fast leg + a fixed 15%-budget `reconstruct_x` leg for G7 coverage, §6.6). Locked in as ref
-  `55883143`.
-- `attack_deputy.py` — the universal-survivor CONFUSED_DEPUTY hedge (8/8 proxy-guardrail
+All attack/eval/measurement code lives under **`src/`** (moved out of the repo root
+2026-09-03 so the top level only holds `README.md`/`STATUS.md`/`LICENSE`/`docs/`/`src/`/
+`probes/`/`tools/` — each script's SDK/`data/`-lookup logic was updated for the new depth and
+re-verified: `local_eval.py`, `transfer_matrix.py`, and `transfer_matrix_deputy.py` all still
+run clean from `src/`, and `tools/build_priv_nb.py` still builds a valid notebook from
+`src/attack_priv.py`).
+
+- **`src/attack_term.py`** — **Final-1** (throughput, wrap-up terminal, `.internal` egress).
+  Locked in as ref `55722165`.
+- **`src/attack_priv.py`** — **Final-2** (private-transfer, redesigned two-leg version —
+  `bare_ok` fast leg + a fixed 15%-budget `reconstruct_x` leg for G7 coverage, §6.6). Locked in
+  as ref `55883143`.
+- `src/attack_deputy.py` — the universal-survivor CONFUSED_DEPUTY hedge (8/8 proxy-guardrail
   coverage). Evaluated as a possible Final-2 swap (2026-08-26) and **not selected** on EV
   grounds (§6.5–6.6); kept as a validated, documented alternative, not active.
-- `attack_d.py` — the pre-wrap-up-terminal 86.40 baseline; still a live code dependency of
+- `src/attack_d.py` — the pre-wrap-up-terminal 86.40 baseline; still a live code dependency of
   `attack_term.py`/`attack_ling.py`/`transfer_matrix.py`/several `local_eval_*.py`, not just
-  historical record. `attack_ling.py` — the retired Final-2 predecessor `attack_priv.py`
+  historical record. `src/attack_ling.py` — the retired Final-2 predecessor `attack_priv.py`
   improved on; still a live dependency of `attack_priv.py`/`transfer_matrix.py`.
-  `attack_term_multi.py` — the forged multi-post technique, live-tested and killed (82.87 vs
-  91.40); still a dependency of `local_eval_term_multi.py`. `attack.py`/`attack_c.py` — the
-  earliest baseline (64.44) and the voided multi-message attempt (v21), kept as the specific
+  `src/attack_term_multi.py` — the forged multi-post technique, live-tested and killed (82.87 vs
+  91.40); still a dependency of `local_eval_term_multi.py`. `src/attack.py`/`src/attack_c.py` —
+  the earliest baseline (64.44) and the voided multi-message attempt (v21), kept as the specific
   numbered evidence the Working Note cites for those results.
 - **Pruned (2026-09-02 cleanup pass, before Working Note submission):** `attack_b.py`,
   `attack_e.py`, `attack_f.py`, `attack_g.py`, `attack_h.py`, `attack_i.py`, `attack_j.py`, and
@@ -467,24 +474,25 @@ private-transfer measurement (§ above) instead of chasing it. See Working Note 
   private-hedge designs, an abandoned reasoning-effort experiment, a voided terminal wording) is
   still evidenced by the files kept above. Fully recoverable via `git log --diff-filter=D` if
   ever needed.
-- `local_eval_*.py` — offline Mode-A validators (real guardrail + stub agent) per active attack
-  variant.
-- `proxy_guardrails.py` + `transfer_matrix.py` — the G0–G7 private-guardrail measurement for the
-  EXFIL-based attacks. `transfer_matrix_deputy.py` — the same measurement for `attack_deputy`
-  (email.send instead of http.post; needed because it isn't an EXFIL attack).
+- `src/local_eval_*.py` — offline Mode-A validators (real guardrail + stub agent) per active
+  attack variant.
+- `src/proxy_guardrails.py` + `src/transfer_matrix.py` — the G0–G7 private-guardrail measurement
+  for the EXFIL-based attacks. `src/transfer_matrix_deputy.py` — the same measurement for
+  `attack_deputy` (email.send instead of http.post; needed because it isn't an EXFIL attack).
 - All `submission_*/` build-artifact directories (including the ones that produced the two
-  locked-in Final refs) were pruned in the same 2026-09-02 cleanup. None were a code dependency
-  of anything; each is regenerable in seconds via `tools/build_*.py` from the corresponding
-  `attack_*.py` source (`build_variant_nb.py` for `attack_term.py`, `build_priv_nb.py` for
-  `attack_priv.py`), and the actually-scored kernel versions live permanently on Kaggle's servers
-  (refs recorded throughout this file), so nothing is lost by not keeping the generated notebook
-  on disk.
+  locked-in Final refs) were pruned in the 2026-09-02 cleanup and are now gitignored so a rebuild
+  can't re-add them. None were a code dependency of anything; each is regenerable in seconds via
+  `tools/build_*.py` from the corresponding `src/attack_*.py` source (`build_variant_nb.py` for
+  `attack_term.py`, `build_priv_nb.py` for `attack_priv.py`), and the actually-scored kernel
+  versions live permanently on Kaggle's servers (refs recorded throughout this file), so nothing
+  is lost by not keeping the generated notebook on disk.
 - `probes/` — the real-model measurement harness (per-hop latency, sentinel-reconstruction
-  fire-rate) on gpt-oss/gemma.
+  fire-rate) on gpt-oss/gemma. Standalone (hardcoded template strings, no import of `src/`), so
+  unaffected by the `src/` move.
 - `tools/` — `build_variant_nb.py`/`build_lottery_nbs.py`/`build_priv_nb.py`/`build_deputy_nb.py`
-  (notebook builders that base64-embed a source attack variant) + `push_submit.py` (push a
-  kernel version, poll for COMPLETE, submit — only `competition_submit_code` consumes a daily
-  slot, pushing is free).
+  (notebook builders that base64-embed a source attack variant from `src/`) + `push_submit.py`
+  (push a kernel version, poll for COMPLETE, submit — only `competition_submit_code` consumes a
+  daily slot, pushing is free).
 - `docs/WORKING_NOTE.md` — the $2,500 write-up. **Published** on Kaggle
   (`kaggle.com/writeups/qwer556617123/budget-optimal-exfiltration-and-measured-private-g`),
   including the post-reveal Epilogue, three embedded figures (`docs/img/`, below), and a
@@ -500,14 +508,11 @@ private-transfer measurement (§ above) instead of chasing it. See Working Note 
   guardrail-coverage matrix, §6.7; public-vs-private scatter, Epilogue), each as a `.png` plus
   the self-contained `.html` source it was rendered from (open the `.html` in a browser to
   reproduce or regenerate the `.png`).
-- `docs/archive/` — superseded documents kept for history, not maintained: early-competition
-  strategy/resume notes (pre-2026-07-20), and `WORKING_NOTE.verbose-original.md` (the Working
-  Note as it stood before the 2026-09-03 condensing pass — same facts, less tightly edited).
 
 ## Reproduce / submit
 
-- Offline validate: `python local_eval_term.py` / `local_eval_priv.py` (needs `PYTHONPATH` →
-  `./data`, the unpacked competition SDK).
+- Offline validate: `python src/local_eval_term.py` / `src/local_eval_priv.py` (each locates the
+  unpacked competition SDK at `./data` automatically; no `PYTHONPATH` needed).
 - Probe real models: push a `probes/probe_*.py` script to kernel
   `qwer556617123/ai-agent-security-probe` (GPU + internet, both GGUF models mounted); read logs
   with `PYTHONUTF8=1 PYTHONIOENCODING=utf-8`.

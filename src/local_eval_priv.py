@@ -16,7 +16,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-DATA = Path(__file__).resolve().parent / "data"
+DATA = Path(__file__).resolve().parent.parent / "data"
 sys.path.insert(0, str(DATA))
 
 from aicomp_sdk.agents.types import (  # noqa: E402

@@ -25,11 +25,12 @@ see the Working Note's
 
 ## Reproducing a result
 
-- `local_eval_*.py` — Mode-A validation of the matching `attack_*.py` against the real packaged
-  guardrail and scorer via a stub agent (needs `PYTHONPATH` pointed at the unpacked competition SDK).
-- `transfer_matrix.py` / `transfer_matrix_deputy.py` — the `G0`–`G7` private-guardrail proxy
-  measurement (Working Note §6).
+- `src/` — every `attack_*.py` variant plus its `local_eval_*.py` Mode-A validator (real packaged
+  guardrail and scorer via a stub agent; needs the unpacked competition SDK at `data/`, which each
+  script locates automatically), and `proxy_guardrails.py` / `transfer_matrix.py` /
+  `transfer_matrix_deputy.py`, the `G0`–`G7` private-guardrail proxy measurement (Working Note §6).
 - `probes/` — the real-model (gpt-oss / Gemma) latency and fire-rate measurement harness.
+- `tools/` — builds a submission notebook from a `src/attack_*.py` source and pushes it to Kaggle.
 
 Full method and file-by-file breakdown: the Working Note's
 [Reproducibility](docs/WORKING_NOTE.md#9-reproducibility) section.
