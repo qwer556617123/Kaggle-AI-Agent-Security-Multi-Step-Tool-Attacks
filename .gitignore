@@ -11,6 +11,11 @@ scratchpad/
 .venv/
 *.egg-info/
 
+# Submission notebooks built by tools/build_*.py (base64-embed a source attack_*.py; the
+# scored kernel versions live permanently on Kaggle, so these are regenerable, not source).
+submission/
+submission_*/
+
 # --- Local secrets / credentials (belt-and-suspenders; creds live in ~/.kaggle) ---
 kaggle.json
 *.key

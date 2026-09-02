@@ -1,11 +1,21 @@
 # Project Status — AI Agent Security: Multi-Step Tool Attacks
 
-Kaggle red-team competition (`ai-agent-security-multi-step-tool-attacks`, $50K, submission
-deadline **2026-09-01** — confirmed via the site's live countdown across three independent
-reads; earlier notes in this repo said 2026-08-25, which was wrong). All-agent development.
-Prize is decided on the **hidden PRIVATE leaderboard** via the participant's **2 chosen Final
-Submissions**; public score is only a development signal, and — separately — is not even
-comparable across the 2026-08-05 harness rewrite (see below).
+Kaggle red-team competition (`ai-agent-security-multi-step-tool-attacks`, $50K, Final Submission
+deadline **2026-09-01**). All-agent development. Prize is decided on the **hidden PRIVATE
+leaderboard** via the participant's **2 chosen Final Submissions**; public score is only a
+development signal, and — separately — is not even comparable across the 2026-08-05 harness
+rewrite (see below).
+
+> **Concluded (2026-09-02): private leaderboard revealed, both Finals scored 0.000 private,
+> rank #3613/~4252.** Everything below this line is the development record as it stood before
+> the reveal — kept intact because the decisions and the reasoning behind them are the point,
+> not the score. The actual result, root-cause analysis, and lessons learned are in the Working
+> Note's [Epilogue](docs/WORKING_NOTE.md#epilogue-the-private-leaderboard-reveal-2026-09-02),
+> not here. The Working Note itself is now **published**
+> (`kaggle.com/writeups/qwer556617123/budget-optimal-exfiltration-and-measured-private-g`); the
+> only remaining step is sharing it on the host's official submission thread (competition
+> discussion `739078`, deadline 2026-09-08 23:59 UTC) — see the updated "Submission mechanism"
+> bullet in the File map below.
 
 ## Current best & finals
 
@@ -475,22 +485,24 @@ private-transfer measurement (§ above) instead of chasing it. See Working Note 
   (notebook builders that base64-embed a source attack variant) + `push_submit.py` (push a
   kernel version, poll for COMPLETE, submit — only `competition_submit_code` consumes a daily
   slot, pushing is free).
-- `docs/WORKING_NOTE.md` — the $2,500 write-up, feature-complete and proofread, ready to publish
-  before the 2026-09-08 Working Note deadline. **Submission mechanism** (confirmed 2026-09-02):
-  Kaggle's built-in Project Writeup feature — log in, "Your Work" (left sidebar) → "Create" →
-  "New Project Writeup" (the black button, not the blue "+" one), paste in the content, and
-  **set it to Public** (host María Cruz's own posted instructions, verified against an identical
-  Working Note Award in another of her competitions — this competition never posted an
-  equivalent announcement, per an unanswered community question, but the mechanism itself is a
-  general Kaggle feature, confirmed by every other Working Note in this competition being
-  published exactly this way: `kaggle.com/writeups/<user>/<slug>`). This competition has no
-  posted "share the link here by [date]" instruction the way some others do; the convention every
-  other Working Note author in this competition actually followed is to ALSO post a companion
-  Discussion Topic titled `[Working Note] <title>` linking to the writeup (see discussion 737100,
-  737535, etc. for examples) — do that too. This final publish step needs the user's own Kaggle
-  login; it is not something to do without their explicit go-ahead each time.
-- `docs/archive/` — early-competition strategy/resume notes (pre-2026-07-20), superseded by
-  this file and the Working Note; kept for history, not maintained.
+- `docs/WORKING_NOTE.md` — the $2,500 write-up. **Published** on Kaggle
+  (`kaggle.com/writeups/qwer556617123/budget-optimal-exfiltration-and-measured-private-g`),
+  including the post-reveal Epilogue, three embedded figures (`docs/img/`, below), and a
+  lessons-learned closing. **Submission mechanism** (confirmed 2026-09-03, official host post):
+  Kaggle staff (Elizabeth Park, on behalf of OpenAI host @owenvallis) posted competition
+  discussion `739078`, "How to submit your Writeup for the Working Note Award" — publish via
+  "Your Work" → "Create" → "New Project Writeup", set it Public, then **comment on that thread
+  with the writeup link by 2026-09-08 23:59 UTC**; that comment is the actual submission
+  mechanism, not an automatic leaderboard link. Winner announcements expected mid-October. This
+  last step needs the user's own Kaggle login and is a public action taken only on their
+  explicit go-ahead.
+- `docs/img/` — the three figures embedded in the Working Note (discovery-timeline chart, §5;
+  guardrail-coverage matrix, §6.7; public-vs-private scatter, Epilogue), each as a `.png` plus
+  the self-contained `.html` source it was rendered from (open the `.html` in a browser to
+  reproduce or regenerate the `.png`).
+- `docs/archive/` — superseded documents kept for history, not maintained: early-competition
+  strategy/resume notes (pre-2026-07-20), and `WORKING_NOTE.verbose-original.md` (the Working
+  Note as it stood before the 2026-09-03 condensing pass — same facts, less tightly edited).
 
 ## Reproduce / submit
 
